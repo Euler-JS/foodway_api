@@ -5,6 +5,9 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
+// Importar middlewares customizados
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -53,36 +56,22 @@ app.get('/', (req, res) => {
   });
 });
 
-// Importar e usar rotas (vamos criar depois)
-// const restaurantRoutes = require('./routes/restaurants');
+// Importar e usar rotas
+const restaurantRoutes = require('./routes/restaurants');
 // const categoryRoutes = require('./routes/categories');
 // const productRoutes = require('./routes/products');
 // const menuRoutes = require('./routes/menu');
 
-// app.use('/api/v1/restaurants', restaurantRoutes);
+app.use('/api/v1/restaurants', restaurantRoutes);
 // app.use('/api/v1/categories', categoryRoutes);
 // app.use('/api/v1/products', productRoutes);
 // app.use('/api/v1/menu', menuRoutes);
 
 // Middleware para rotas não encontradas
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Rota não encontrada',
-    path: req.originalUrl
-  });
-});
+app.use('*', notFoundHandler);
 
 // Middleware global de tratamento de erros
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Erro interno do servidor',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+app.use(errorHandler);
 
 // Iniciar servidor
 app.listen(PORT, () => {
