@@ -407,7 +407,11 @@ const uuidParamSchema = Joi.object({
 
 // Validação customizada para verificar se preço promocional é menor que preço regular
 const validatePromotionPrice = (value, helpers) => {
-  const { regular_price, current_price, is_on_promotion } = helpers.state.ancestors[0];
+  const data = helpers.state.ancestors[0];
+  
+  if (!data) return value;
+  
+  const { regular_price, current_price, is_on_promotion } = data;
   
   if (is_on_promotion && current_price && regular_price) {
     if (parseFloat(current_price) >= parseFloat(regular_price)) {
@@ -418,12 +422,178 @@ const validatePromotionPrice = (value, helpers) => {
   return value;
 };
 
-// Schema com validação customizada
-const createProductWithValidationSchema = createProductSchema.custom(validatePromotionPrice).messages({
+// Schema com validação customizada - aplicada apenas quando necessário
+const createProductWithValidationSchema = Joi.object({
+  category_id: Joi.number()
+    .integer()
+    .positive()
+    .required()
+    .messages({
+      'number.base': 'ID da categoria deve ser um número',
+      'number.integer': 'ID da categoria deve ser um número inteiro',
+      'number.positive': 'ID da categoria deve ser um número positivo',
+      'any.required': 'ID da categoria é obrigatório'
+    }),
+
+  name: Joi.string()
+    .min(2)
+    .max(255)
+    .required()
+    .messages({
+      'string.empty': 'Nome é obrigatório',
+      'string.min': 'Nome deve ter pelo menos 2 caracteres',
+      'string.max': 'Nome deve ter no máximo 255 caracteres',
+      'any.required': 'Nome é obrigatório'
+    }),
+
+  description: Joi.string()
+    .max(2000)
+    .optional()
+    .allow('')
+    .messages({
+      'string.max': 'Descrição deve ter no máximo 2000 caracteres'
+    }),
+
+  regular_price: Joi.number()
+    .positive()
+    .precision(2)
+    .required()
+    .messages({
+      'number.base': 'Preço regular deve ser um número',
+      'number.positive': 'Preço regular deve ser maior que zero',
+      'any.required': 'Preço regular é obrigatório'
+    }),
+
+  current_price: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      'number.base': 'Preço atual deve ser um número',
+      'number.positive': 'Preço atual deve ser maior que zero'
+    }),
+
+  is_on_promotion: Joi.boolean()
+    .optional()
+    .default(false),
+
+  image_url: Joi.string()
+    .uri()
+    .max(500)
+    .optional()
+    .allow('')
+    .default('product_default.png')
+    .messages({
+      'string.uri': 'URL da imagem deve ter um formato válido',
+      'string.max': 'URL da imagem deve ter no máximo 500 caracteres'
+    }),
+
+  is_available: Joi.boolean()
+    .optional()
+    .default(true),
+
+  sort_order: Joi.number()
+    .integer()
+    .min(0)
+    .optional()
+    .messages({
+      'number.base': 'Ordem deve ser um número',
+      'number.integer': 'Ordem deve ser um número inteiro',
+      'number.min': 'Ordem deve ser maior ou igual a 0'
+    })
+}).custom((value, helpers) => {
+  // Validação customizada apenas quando is_on_promotion é true
+  if (value.is_on_promotion && value.current_price && value.regular_price) {
+    if (parseFloat(value.current_price) >= parseFloat(value.regular_price)) {
+      return helpers.error('custom.promotionPrice');
+    }
+  }
+  return value;
+}).messages({
   'custom.promotionPrice': 'Preço promocional deve ser menor que o preço regular'
 });
 
-const updateProductWithValidationSchema = updateProductSchema.custom(validatePromotionPrice).messages({
+const updateProductWithValidationSchema = Joi.object({
+  category_id: Joi.number()
+    .integer()
+    .positive()
+    .optional()
+    .messages({
+      'number.base': 'ID da categoria deve ser um número',
+      'number.integer': 'ID da categoria deve ser um número inteiro',
+      'number.positive': 'ID da categoria deve ser um número positivo'
+    }),
+
+  name: Joi.string()
+    .min(2)
+    .max(255)
+    .optional()
+    .messages({
+      'string.empty': 'Nome não pode estar vazio',
+      'string.min': 'Nome deve ter pelo menos 2 caracteres',
+      'string.max': 'Nome deve ter no máximo 255 caracteres'
+    }),
+
+  description: Joi.string()
+    .max(2000)
+    .optional()
+    .allow('')
+    .messages({
+      'string.max': 'Descrição deve ter no máximo 2000 caracteres'
+    }),
+
+  regular_price: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      'number.base': 'Preço regular deve ser um número',
+      'number.positive': 'Preço regular deve ser maior que zero'
+    }),
+
+  current_price: Joi.number()
+    .positive()
+    .precision(2)
+    .optional()
+    .messages({
+      'number.base': 'Preço atual deve ser um número',
+      'number.positive': 'Preço atual deve ser maior que zero'
+    }),
+
+  is_on_promotion: Joi.boolean()
+    .optional(),
+
+  image_url: Joi.string()
+    .uri()
+    .max(500)
+    .optional()
+    .allow('')
+    .messages({
+      'string.uri': 'URL da imagem deve ter um formato válido',
+      'string.max': 'URL da imagem deve ter no máximo 500 caracteres'
+    }),
+
+  is_available: Joi.boolean()
+    .optional(),
+
+  sort_order: Joi.number()
+    .integer()
+    .min(0)
+    .optional()
+    .messages({
+      'number.base': 'Ordem deve ser um número',
+      'number.integer': 'Ordem deve ser um número inteiro',
+      'number.min': 'Ordem deve ser maior ou igual a 0'
+    })
+}).custom((value, helpers) => {
+  // Validação customizada apenas quando is_on_promotion é true
+  if (value.is_on_promotion && value.current_price && value.regular_price) {
+    if (parseFloat(value.current_price) >= parseFloat(value.regular_price)) {
+      return helpers.error('custom.promotionPrice');
+    }
+  }
+  return value;
+}).messages({
   'custom.promotionPrice': 'Preço promocional deve ser menor que o preço regular'
 });
 
@@ -510,12 +680,12 @@ module.exports = {
   validate,
   validateCategoryExists,
   
-  // Middlewares prontos para uso
-  validateCreate: [validate(createProductWithValidationSchema), validateCategoryExists],
-  validateUpdate: [validate(updateProductWithValidationSchema), validateCategoryExists],
+  // Middlewares prontos para uso - simplificados
+  validateCreate: validate(createProductWithValidationSchema),
+  validateUpdate: validate(updateProductWithValidationSchema),
   validateDuplicate: validate(duplicateProductSchema),
   validatePromotion: validate(promotionSchema),
-  validateMoveCategory: [validate(moveCategorySchema), validateCategoryExists],
+  validateMoveCategory: validate(moveCategorySchema),
   validateReorder: validate(reorderProductsSchema),
   validateQuery: validate(queryParamsSchema, 'query'),
   validateCategoryParam: validate(categoryParamsSchema, 'params'),

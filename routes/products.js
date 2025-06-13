@@ -54,7 +54,7 @@ router.get('/', validateQuery, ProductController.index);
  * @desc Criar novo produto
  * @access Public
  */
-router.post('/', ...validateCreate, ProductController.store);
+router.post('/', validateCreate, ProductController.store);
 
 /**
  * @route HEAD /api/v1/products/:id
@@ -75,7 +75,7 @@ router.get('/:id', validateId, ProductController.show);
  * @desc Atualizar produto
  * @access Public
  */
-router.put('/:id', validateId, ...validateUpdate, ProductController.update);
+router.put('/:id', validateId, validateUpdate, ProductController.update);
 
 /**
  * @route DELETE /api/v1/products/:id
@@ -117,6 +117,6 @@ router.post('/:id/duplicate', validateId, validateDuplicate, ProductController.d
  * @desc Mover produto para outra categoria
  * @access Public
  */
-router.patch('/:id/move', validateId, ...validateMoveCategory, ProductController.moveToCategory);
+router.patch('/:id/move', validateId, validateMoveCategory, ProductController.moveToCategory);
 
 module.exports = router;

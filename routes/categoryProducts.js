@@ -40,6 +40,6 @@ router.get('/', validateCategoryParam, validateQuery, ProductController.indexByC
  * @desc Criar produto para a categoria
  * @access Public
  */
-router.post('/', validateCategoryParam, ...validateCreate, ProductController.storeForCategory);
+router.post('/', validateCategoryParam, validateCreate, ProductController.storeForCategory);
 
 module.exports = router;
