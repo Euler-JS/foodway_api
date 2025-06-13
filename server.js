@@ -60,6 +60,18 @@ app.get('/', (req, res) => {
 const restaurantRoutes = require('./routes/restaurants');
 const categoryRoutes = require('./routes/categories');
 const restaurantCategoryRoutes = require('./routes/restaurantCategories');
+const productRoutes = require('./routes/products');
+const categoryProductRoutes = require('./routes/categoryProducts');
+const restaurantProductRoutes = require('./routes/restaurantProducts');
+// const menuRoutes = require('./routes/menu');
+
+app.use('/api/v1/restaurants', restaurantRoutes);
+app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/restaurants/:restaurant_id/categories', restaurantCategoryRoutes);
+app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/categories/:category_id/products', categoryProductRoutes);
+app.use('/api/v1/restaurants/:restaurant_id/products', restaurantProductRoutes);
+// app.use('/api/v1/menu', menuRoutes);antCategories');
 // const productRoutes = require('./routes/products');
 // const menuRoutes = require('./routes/menu');
 
