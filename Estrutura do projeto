@@ -1,0 +1,148 @@
+# Estrutura do Projeto
+
+```
+restaurant-menu-api/
+├── config/
+│   └── supabase.js
+├── controllers/
+│   ├── restaurantController.js
+│   ├── categoryController.js
+│   ├── productController.js
+│   └── menuController.js
+├── middleware/
+│   ├── auth.js
+│   ├── validation.js
+│   └── upload.js
+├── models/
+│   ├── Restaurant.js
+│   ├── Category.js
+│   ├── Product.js
+│   └── index.js
+├── routes/
+│   ├── restaurants.js
+│   ├── categories.js
+│   ├── products.js
+│   └── menu.js
+├── utils/
+│   ├── response.js
+│   ├── errors.js
+│   └── helpers.js
+├── validators/
+│   ├── restaurantValidator.js
+│   ├── categoryValidator.js
+│   └── productValidator.js
+├── sql/
+│   └── schema.sql
+├── .env.example
+├── .gitignore
+├── package.json
+├── server.js
+└── README.md
+```
+
+## Scripts SQL para Supabase
+
+Execute este script SQL no editor SQL do Supabase para criar as tabelas:
+
+```sql
+-- Criar extensão para UUID se não existir
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Tabela de restaurantes
+CREATE TABLE restaurants (
+    id SERIAL PRIMARY KEY,
+    uuid UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    logo VARCHAR(500) DEFAULT 'logo_default.png',
+    address TEXT,
+    city VARCHAR(100),
+    phone VARCHAR(20),
+    email VARCHAR(255),
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela de categorias
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    uuid UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+    restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    image_url VARCHAR(500) DEFAULT 'category_default.png',
+    sort_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela de produtos
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    uuid UUID DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+    category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    regular_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    current_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    is_on_promotion BOOLEAN DEFAULT false,
+    image_url VARCHAR(500) DEFAULT 'product_default.png',
+    is_available BOOLEAN DEFAULT true,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para melhorar performance
+CREATE INDEX idx_categories_restaurant_id ON categories(restaurant_id);
+CREATE INDEX idx_products_category_id ON products(category_id);
+CREATE INDEX idx_restaurants_active ON restaurants(is_active);
+CREATE INDEX idx_categories_active ON categories(is_active);
+CREATE INDEX idx_products_available ON products(is_available);
+
+-- Trigger para atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Aplicar trigger nas tabelas
+CREATE TRIGGER update_restaurants_updated_at 
+    BEFORE UPDATE ON restaurants 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_categories_updated_at 
+    BEFORE UPDATE ON categories 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_products_updated_at 
+    BEFORE UPDATE ON products 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Inserir dados de exemplo
+INSERT INTO restaurants (name, address, city, phone, email, description) VALUES
+('Casa das Pizzas', 'Estorilhos - Beira, próximo ao Hotel Golden', 'Beira', '879123456', 'contato@casadaspizzas.mz', 'A melhor pizza da cidade!');
+
+-- Obter o ID do restaurante inserido para usar nas categorias
+INSERT INTO categories (restaurant_id, name, description, sort_order) VALUES
+(1, 'PIZZAS TRADICIONAIS', 'Nossas deliciosas pizzas tradicionais', 1),
+(1, 'PIZZAS ESPECIAIS', 'Pizzas especiais da casa', 2),
+(1, 'PIZZAS VEGETARIANAS', 'Opções vegetarianas', 3),
+(1, 'BEBIDAS', 'Bebidas refrescantes', 4),
+(1, 'SOBREMESAS', 'Doces para finalizar', 5),
+(1, 'ACOMPANHAMENTOS', 'Acompanhamentos saborosos', 6);
+```
+
+## Próximos Passos
+
+1. **Configure o Supabase**: Crie uma conta no Supabase e execute o script SQL acima
+2. **Configure as variáveis de ambiente**: Copie `.env.example` para `.env` e preencha com suas credenciais do Supabase
+3. **Instale as dependências**: `npm install`
+4. **Teste o servidor**: `npm run dev`
+
+Está pronto para o próximo passo? Podemos criar os **models** e **controllers** básicos para começar a operação CRUD dos restaurantes.
