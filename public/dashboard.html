@@ -1001,7 +1001,7 @@
     <!-- ======================= Modal ================== -->
     <div id="restaurantModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <span class="close" onclick="closeModal('restaurant')">&times;</span>
             <h2 id="modalTitle">Novo Restaurante</h2>
             <form id="restaurantForm">
                 <div class="form-group">
@@ -1029,7 +1029,7 @@
                     <textarea id="description" name="description" rows="3"></textarea>
                 </div>
                 <div style="text-align: right; margin-top: 30px;">
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('restaurant')">Cancelar</button>
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
             </form>
@@ -1129,7 +1129,7 @@
                 
                 const responseCategories = await fetch(`${apiBaseUrl}/categories/stats`);
                 const dataCategories = await responseCategories.json();
-                
+
                 if (data.success) {
                     document.getElementById('restaurantCount').textContent = data.data?.active || 0;
                     // You can load other stats here
@@ -1450,7 +1450,7 @@
         window.onclick = function(event) {
             const modal = document.getElementById('restaurantModal');
             if (event.target === modal) {
-                closeModal();
+                closeModal('restaurant');
             }
         }
 
