@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manna Soft - Sistema para Restaurantes</title>
+    <style>
+        :root {
+            --primary-color: #FF5722;
+            --secondary-color: #FF7043;
+            --light-color: #FFF3E0;
+            --dark-color: #333333;
+            --white: #FFFFFF;
+            --gray: #F5F5F5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--light-color);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 5rem 2rem;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-btn {
+            background-color: var(--white);
+            color: var(--primary-color);
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .demo-btn:hover {
+            background-color: var(--light-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .section-title p {
+            color: var(--dark-color);
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: var(--gray);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mockup-section {
+            background-color: var(--gray);
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .mockup-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .mockup-img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .pricing {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .price-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .price-card.featured {
+            background-color: var(--primary-color);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-card.featured::before {
+            content: "Mais Popular";
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background-color: var(--white);
+            color: var(--primary-color);
+            padding: 5px 30px;
+            transform: rotate(45deg);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .price-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .price-card.featured .price {
+            color: var(--white);
+        }
+
+        .price span {
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .price-features {
+            margin: 2rem 0;
+            list-style: none;
+        }
+
+        .price-features li {
+            margin-bottom: 0.8rem;
+        }
+
+        .price-card .demo-btn {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .price-card.featured .demo-btn {
+            background-color: var(--white);
+            color: var(--primary-color);
+        }
+
+        .testimonials {
+            background-color: var(--gray);
+            padding: 5rem 2rem;
+        }
+
+        .testimonial-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .testimonial-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .author-info h4 {
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .cta {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 5rem 2rem;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--white);
+            padding: 3rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-col h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-col ul li a {
+            color: #aaa;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: #444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #444;
+            color: #aaa;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">MannaSoftware</a>
+            <div class="nav-menu">
+                <a href="#features">Recursos</a>
+                <a href="#mockup">Como Funciona</a>
+                <a href="#pricing">Planos</a>
+                <a href="#testimonials">Depoimentos</a>
+                <a href="#contact">Contato</a>
+            </div>
+                            <nav class="flex items-center justify-end gap-4">
+                                            <a href="https://mannauniverse-aybw3.kinsta.app/login"
+                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal">
+                            Log in
+                        </a>
+
+                                                            </nav>
+                    </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Sistema Completo para Gestão de Restaurantes</h1>
+            <p>Gerencie múltiplos restaurantes, categorias de pratos e cardápios em uma única plataforma intuitiva e
+                eficiente.</p>
+            <a href="#demo" class="demo-btn">Agendar uma Demo</a>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="section-title">
+            <h2>Recursos Principais</h2>
+            <p>Tudo o que você precisa para gerenciar seu negócio gastronômico de forma eficiente</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Multiplataforma</h3>
+                <p>Acesse seu sistema de qualquer dispositivo - computador, tablet ou smartphone</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🍔</div>
+                <h3>Gestão de Cardápios</h3>
+                <p>Crie e edite facilmente os cardápios com categorias, preços e descrições</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏪</div>
+                <h3>Múltiplos Restaurantes</h3>
+                <p>Gerencie diversos estabelecimentos em uma única plataforma centralizada</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Relatórios Detalhados</h3>
+                <p>Análise de vendas, produtos mais populares e desempenho de cada restaurante</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛒</div>
+                <h3>Carrinho Intuitivo</h3>
+                <p>Interface simples para adicionar itens e finalizar pedidos rapidamente</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>Personalização Total</h3>
+                <p>Adapte o sistema às suas necessidades com opções de customização</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mockup-section" id="mockup">
+        <div class="mockup-container">
+            <div class="section-title">
+                <h2>Uma Interface Intuitiva e Moderna</h2>
+                <p>Veja como é fácil gerenciar seus restaurantes e cardápios</p>
+            </div>
+            <img src="/api/placeholder/800/500" alt="Interface do Sistema" class="mockup-img">
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="section-title">
+            <h2>Planos de Pagamento</h2>
+            <p>Oferecemos preços flexíveis que se adaptam às suas necessidades, quer esteja a começar ou a expandir-se.
+                Escolha o plano mais adequado para si.</p>
+        </div>
+        <div class="pricing-cards">
+            <div class="price-card">
+                <h3>Starter</h3>
+                <div class="price">1200MT<span>/mês</span></div>
+                <ul class="price-features">
+                    <li>Menu Digital</li>
+                    <li>WebApp (Android, iOS, Windows e MacBook)</li>
+                    
+                </ul>
+                <a href="#" class="demo-btn">Começar Agora</a>
+            </div>
+            <div class="price-card">
+                <h3>Básico</h3>
+                <div class="price">1800MT<span>/mês</span></div>
+                <ul class="price-features">
+                    <li>14 DIAS - FREE</li>
+                    <li>Acesso Web via QR Code (cliente vê cardápio e faz pedido)</li>
+                    <li>Gestão simples de produtos no painel</li>
+                    <li>1 caixa de atendimento</li>
+                    <li>Relatório simples de pedido</li>
+                </ul>
+                <a href="#" class="demo-btn">Começar Agora</a>
+            </div>
+            <div class="price-card">
+                <h3>Intermediário</h3>
+                <div class="price">2500MT<span>/mês</span></div>
+                <ul class="price-features">
+                    <li>Tudo do plano básico</li>
+                    <li>Painel com gestão de pedidos</li>
+                    <li>Impressão/Exportação de recibos em PDF</li>
+                    <li>3 caixas</li>
+                    <li>Módulo de garçom: ver e aceitar pedidos</li>
+                    <li>Registro de 2 Restaurantes</li>
+                    <li>Acesso de 3 garçons</li>
+                </ul>
+                <a href="#" class="demo-btn">Começar Agora</a>
+            </div>
+            <div class="price-card featured">
+                <h3>Profissional</h3>
+                <div class="price">4000MT<span>/mês</span></div>
+                <ul class="price-features">
+                    <li>Tudo do plano intermediário</li>
+                    <li>POS com produtos cadastrados e customizáveis</li>
+                    <li>Registro de 4 Restaurantes</li>
+                    <li>Até 5 garçons + 5 caixas</li>
+                    <li>Relatórios detalhados (vendas, tempo de atendimento, desempenho)</li>
+                    <li>Suporte prioritário</li>
+                </ul>
+                <a href="#" class="demo-btn">Começar Agora</a>
+            </div>
+            <div class="price-card">
+                <h3>Personalizado</h3>
+                <ul class="price-features">
+                    <li>Tudo do plano profissional</li>
+                    <li>Número ilimitado de usuários (garçons e caixas)</li>
+                    <li>App white-label (logo e nome personalizado)</li>
+                    <li>Integração com sistemas externos (API)</li>
+                    <li>Acompanhamento mensal e suporte dedicado</li>
+                </ul>
+                <a href="#" class="demo-btn">Contacte-nos</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+        <div class="testimonial-container">
+            <div class="section-title">
+                <h2>O Que Nossos Clientes Dizem</h2>
+                <p>Confira os depoimentos de quem já utiliza nossa plataforma</p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Desde que implementamos o sistema, conseguimos aumentar nossas vendas
+                        em 30% e reduzir erros de pedidos. A interface é extremamente intuitiva."</p>
+                    <div class="testimonial-author">
+                        <div class="author-img">JM</div>
+                        <div class="author-info">
+                            <h4>João Marques</h4>
+                            <p>Casa Das Pizzas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"A possibilidade de gerenciar todos os nossos restaurantes em uma única
+                        plataforma facilitou muito nosso trabalho diário. Recomendo!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-img">AS</div>
+                        <div class="author-info">
+                            <h4>Ana Silva</h4>
+                            <p>Rede Burger Palace</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"O suporte técnico é excelente e estão sempre implementando melhorias
+                        baseadas no feedback dos clientes. Vale cada centavo investido."</p>
+                    <div class="testimonial-author">
+                        <div class="author-img">CP</div>
+                        <div class="author-info">
+                            <h4>Carlos Pereira</h4>
+                            <p>Sabor Gourmet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="demo">
+        <div class="cta-container">
+            <h2>Pronto para revolucionar a gestão dos seus restaurantes?</h2>
+            <p>Agende uma demonstração gratuita e veja como nossa plataforma pode ajudar seu negócio</p>
+            <a href="#" class="demo-btn">Agendar Demo Grátis</a>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>MannaSoftware</h3>
+                <p>Sistema completo para gestão de restaurantes, cardápios e pedidos.</p>
+                <div class="social-links">
+                    <a href="#">FB</a>
+                    <a href="#">IG</a>
+                    <a href="#">TW</a>
+                    <a href="#">LI</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Empresa</h3>
+                <ul>
+                    <li><a href="#">Sobre nós</a></li>
+                    <li><a href="#">Carreiras</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Imprensa</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Recursos</h3>
+                <ul>
+                    <li><a href="#">Cardápios</a></li>
+                    <li><a href="#">Gestão de Restaurantes</a></li>
+                    <li><a href="#">Relatórios</a></li>
+                    <li><a href="#">Integrações</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Suporte</h3>
+                <ul>
+                    <li><a href="#">Central de Ajuda</a></li>
+                    <li><a href="#">Tutoriais</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Contato</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2025 MannaSoftware. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

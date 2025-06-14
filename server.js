@@ -70,6 +70,11 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+// Rota específica para o inicio da pagina
+app.get('/start', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'start.html'));
+});
+
 // Rota para acessar o dashboard diretamente
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
@@ -84,7 +89,8 @@ app.get('/', (req, res) => {
     documentation: '/api/docs',
     health: '/health',
     dashboard: '/dashboard',
-    admin: '/admin'
+    admin: '/admin',
+    start: '/start'
   });
 });
 
@@ -98,6 +104,7 @@ const productRoutes = require('./routes/products');
 const categoryProductRoutes = require('./routes/categoryProducts');
 const restaurantProductRoutes = require('./routes/restaurantProducts');
 const menuRoutes = require('./routes/menu');
+const { start } = require('repl');
 
 app.use('/api/v1/restaurants', restaurantRoutes);
 app.use('/api/v1/categories', categoryRoutes);
