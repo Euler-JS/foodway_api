@@ -1358,6 +1358,9 @@
         const apiBaseUrl = window.location.origin + '/api/v1';
         let currentEditId = null;
         let restaurantsData = [];
+        let allProductsData = [];
+        let allCategoriesForProducts = [];
+
 
         // Navigation functionality
         function initNavigation() {
@@ -1594,15 +1597,16 @@
                     document.getElementById('categoryName').value = data.name || '';
                     document.getElementById('categoryDescription').value = data.description || '';
                     document.getElementById('categoryImage').value = data.image_url || '';
+                }
         } else if (type === 'product') {
             openProductModal(data);
-        }
+            return;
+        } 
          else {
             form.reset();
         }
         
         modal.style.display = 'block';
-    }
         }
 
         function closeModal(type) {
@@ -1781,6 +1785,7 @@
             await loadStats();
             await loadRestaurants();
             await loadCategories();
+            await loadCategoriesForProducts();
 
             setTimeout(setupCategoryFilters, 500);
             
@@ -2263,8 +2268,6 @@ async function duplicateCategory(id) {
     }
 }
 
-let allProductsData = [];
-let allCategoriesForProducts = [];
 
 /**
  * Carregar todos os produtos
