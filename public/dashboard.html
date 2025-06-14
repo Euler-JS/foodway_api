@@ -697,6 +697,171 @@
     background: var(--orange);
     color: var(--white);
 }
+
+/* Estilos específicos para produtos */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.product-title {
+    flex: 1;
+}
+
+.product-title h3 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 1.2rem;
+}
+
+.product-category {
+    color: var(--black2);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.product-status-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-end;
+}
+
+.product-price {
+    background: var(--light-color);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.price-regular {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.price-promotion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.price-current {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.price-old {
+    text-decoration: line-through;
+    color: var(--black2);
+    font-size: 0.9rem;
+}
+
+.discount-badge {
+    background: var(--red);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.product-description {
+    color: var(--black1);
+    font-size: 0.9rem;
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.product-meta {
+    margin: 15px 0;
+    color: var(--black2);
+    font-size: 0.9rem;
+}
+
+.product-meta p {
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.product-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.status.available {
+    background: var(--green);
+    color: var(--white);
+}
+
+.status.unavailable {
+    background: var(--red);
+    color: var(--white);
+}
+
+.status.promotion {
+    background: var(--orange);
+    color: var(--white);
+}
+
+.filters-bar .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filters-bar label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-bar > div {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 
@@ -964,12 +1129,64 @@
     </div>
 </div>
 
-            <div class="content-section" id="products">
-                <div style="padding: 20px;">
-                    <h2 style="color: var(--primary-color); margin-bottom: 20px;">Gestão de Produtos</h2>
-                    <p>Interface de produtos em desenvolvimento...</p>
+           <div class="content-section" id="products">
+    <div style="padding: 20px;">
+        <div class="cardHeader" style="margin-bottom: 30px;">
+            <h2>Gestão de Produtos</h2>
+            <button class="btn" onclick="openModal('product')">
+                <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                Novo Produto
+            </button>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="filters-bar" style="background: var(--white); padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="filter-group">
+                    <label>Buscar:</label>
+                    <input type="text" id="productSearch" placeholder="Nome do produto..." style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
                 </div>
+                <div class="filter-group">
+                    <label>Categoria:</label>
+                    <select id="productCategoryFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Restaurante:</label>
+                    <select id="productRestaurantFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="productStatusFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                        <option value="true">Disponível</option>
+                        <option value="false">Indisponível</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Promoção:</label>
+                    <select id="productPromotionFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                        <option value="true">Em Promoção</option>
+                        <option value="false">Preço Normal</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="clearProductFilters()" style="padding: 8px 15px;">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    Limpar
+                </button>
             </div>
+        </div>
+        
+        <!-- Grid de Produtos -->
+        <div class="product-grid" id="productGrid">
+            <!-- Products will be loaded here -->
+        </div>
+    </div>
+</div>
 
             <div class="content-section" id="menu">
                 <div style="padding: 20px;">
@@ -1068,6 +1285,73 @@
     </div>
 </div>
 
+<!-- Modal de Produto -->
+<div id="productModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <span class="close" onclick="closeModal('product')">&times;</span>
+        <h2 id="productModalTitle">Novo Produto</h2>
+        <form id="productForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="productCategory">Categoria *</label>
+                    <select id="productCategory" name="category_id" required>
+                        <option value="">Selecione uma categoria</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productName">Nome *</label>
+                    <input type="text" id="productName" name="name" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="productDescription">Descrição</label>
+                <textarea id="productDescription" name="description" rows="3"></textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="productRegularPrice">Preço Regular *</label>
+                    <input type="number" id="productRegularPrice" name="regular_price" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="productCurrentPrice">Preço Atual</label>
+                    <input type="number" id="productCurrentPrice" name="current_price" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="productSortOrder">Ordem</label>
+                    <input type="number" id="productSortOrder" name="sort_order" min="0">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="productImage">URL da Imagem</label>
+                <input type="url" id="productImage" name="image_url">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="productPromotion" name="is_on_promotion">
+                        Em Promoção
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="productAvailable" name="is_available" checked>
+                        Disponível
+                    </label>
+                </div>
+            </div>
+            
+            <div style="text-align: right; margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closeModal('product')">Cancelar</button>
+                <button type="submit" class="btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
     <!-- =========== Scripts =========  -->
     <script>
         // Global variables
@@ -1117,6 +1401,10 @@
             // Load data for specific sections
             if (sectionName === 'restaurants') {
                 loadRestaurants();
+            } else if (sectionName === 'categories') {
+                loadCategories();
+            } else if (sectionName === 'products') {
+                loadProducts();
             }
         }
 
@@ -1130,15 +1418,30 @@
                 const responseCategories = await fetch(`${apiBaseUrl}/categories/stats`);
                 const dataCategories = await responseCategories.json();
 
+                // Carregar estatísticas de produtos
+                const responseProducts = await fetch(`${apiBaseUrl}/products/stats`);
+                const dataProducts = await responseProducts.json();
+                
+                // Carregar produtos em promoção
+                const responsePromotions = await fetch(`${apiBaseUrl}/products/promotions`);
+                const dataPromotions = await responsePromotions.json();
+
                 if (data.success) {
                     document.getElementById('restaurantCount').textContent = data.data?.active || 0;
                     // You can load other stats here
-                    document.getElementById('productCount').textContent = '0';
-                    document.getElementById('promotionCount').textContent = '0';
+                    
                 }
 
                 if (dataCategories.success) {
                     document.getElementById('categoryCount').textContent = dataCategories.data?.active || 0;
+                }
+
+                 if (dataProducts.success) {
+                        document.getElementById('productCount').textContent = dataProducts.data?.available || 0;
+                }
+                    
+                if (dataPromotions.success) {
+                        document.getElementById('promotionCount').textContent = dataPromotions.data?.pagination?.total || 0;
                 }
             } catch (error) {
                 showError('Erro ao carregar estatísticas: ' + error.message);
@@ -1269,29 +1572,32 @@
                 
                 modal.style.display = 'block';
             } else if (type === 'category') {
-        const modal = document.getElementById('categoryModal');
-        const title = document.getElementById('categoryModalTitle');
-        const form = document.getElementById('categoryForm');
-        
-        currentEditId = data ? data.id : null;
-        title.textContent = data ? 'Editar Categoria' : 'Nova Categoria';
-        
-        // Populate restaurant select
-        const restaurantSelect = document.getElementById('categoryRestaurant');
-        restaurantSelect.innerHTML = '<option value="">Selecione um restaurante</option>';
-        restaurantsData.forEach(restaurant => {
-            const option = document.createElement('option');
-            option.value = restaurant.id;
-            option.textContent = restaurant.name;
-            restaurantSelect.appendChild(option);
-        });
-        
-        if (data) {
-            document.getElementById('categoryRestaurant').value = data.restaurant_id;
-            document.getElementById('categoryName').value = data.name || '';
-            document.getElementById('categoryDescription').value = data.description || '';
-            document.getElementById('categoryImage').value = data.image_url || '';
-        } else {
+                const modal = document.getElementById('categoryModal');
+                const title = document.getElementById('categoryModalTitle');
+                const form = document.getElementById('categoryForm');
+                
+                currentEditId = data ? data.id : null;
+                title.textContent = data ? 'Editar Categoria' : 'Nova Categoria';
+                
+                // Populate restaurant select
+                const restaurantSelect = document.getElementById('categoryRestaurant');
+                restaurantSelect.innerHTML = '<option value="">Selecione um restaurante</option>';
+                restaurantsData.forEach(restaurant => {
+                    const option = document.createElement('option');
+                    option.value = restaurant.id;
+                    option.textContent = restaurant.name;
+                    restaurantSelect.appendChild(option);
+                });
+                
+                if (data) {
+                    document.getElementById('categoryRestaurant').value = data.restaurant_id;
+                    document.getElementById('categoryName').value = data.name || '';
+                    document.getElementById('categoryDescription').value = data.description || '';
+                    document.getElementById('categoryImage').value = data.image_url || '';
+        } else if (type === 'product') {
+            openProductModal(data);
+        }
+         else {
             form.reset();
         }
         
@@ -1305,6 +1611,9 @@
             } else if (type === 'category') {
                     document.getElementById('categoryModal').style.display = 'none';
                 }
+                else if (type === 'product') {
+        document.getElementById('productModal').style.display = 'none';
+    }
     currentEditId = null;
         }
 
@@ -1448,9 +1757,16 @@
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('restaurantModal');
-            if (event.target === modal) {
+            const restaurantModal = document.getElementById('restaurantModal');
+            const categoryModal = document.getElementById('categoryModal');
+            const productModal = document.getElementById('productModal');
+            
+            if (event.target === restaurantModal) {
                 closeModal('restaurant');
+            } else if (event.target === categoryModal) {
+                closeModal('category');
+            } else if (event.target === productModal) {
+                closeModal('product');
             }
         }
 
@@ -1459,6 +1775,7 @@
             initNavigation();
             setupSearch();
             setupForms();
+            setupProductForm();
             
             // Load initial data
             await loadStats();
@@ -1471,6 +1788,26 @@
             setInterval(async () => {
                 await loadStats();
             }, 5 * 60 * 1000);
+
+            setTimeout(() => {
+        // Configurar formulários
+        if (document.getElementById('productForm')) {
+            setupProductForm();
+        }
+        
+        // Configurar filtros
+        if (document.getElementById('productSearch')) {
+            setupProductFilters();
+        }
+        
+        // Configurar navegação para carregar produtos
+        const productsNavItem = document.querySelector('[data-section="products"]');
+        if (productsNavItem) {
+            productsNavItem.addEventListener('click', () => {
+                setTimeout(loadProducts, 100);
+            });
+        }
+    }, 1000);
         });
 
         //Categorias
@@ -1921,6 +2258,721 @@ async function duplicateCategory(id) {
         }
     } catch (error) {
         showError('Erro ao duplicar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+let allProductsData = [];
+let allCategoriesForProducts = [];
+
+/**
+ * Carregar todos os produtos
+ */
+async function loadProducts() {
+    try {
+        showLoading(true);
+        const response = await fetch(`${apiBaseUrl}/products?limit=100`);
+        const data = await response.json();
+        
+        console.log("Dados de Produtos:", data);
+        
+        if (data.success && data.data && data.data.data) {
+            allProductsData = data.data.data;
+            await loadCategoriesForProducts();
+            populateProductFilters();
+            applyProductFilters();
+        } else {
+            allProductsData = [];
+            displayProducts([]);
+        }
+    } catch (error) {
+        showError('Erro ao carregar produtos: ' + error.message);
+        allProductsData = [];
+        displayProducts([]);
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * Carregar categorias para os filtros e formulários
+ */
+async function loadCategoriesForProducts() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/categories?limit=100`);
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.data) {
+            allCategoriesForProducts = data.data.data;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+        allCategoriesForProducts = [];
+    }
+}
+
+/**
+ * Exibir produtos na interface
+ */
+function displayProducts(products) {
+    const grid = document.getElementById('productGrid');
+    
+    if (!products || products.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                <ion-icon name="fast-food-outline" style="font-size: 4rem; color: var(--black2); margin-bottom: 20px;"></ion-icon>
+                <h3 style="color: var(--black2); margin-bottom: 10px;">Nenhum produto encontrado</h3>
+                <p style="color: var(--black2); margin-bottom: 30px;">Tente ajustar os filtros ou criar um novo produto</p>
+                <button class="btn-primary" onclick="openModal('product')">
+                    <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                    Criar Produto
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = products.map(product => {
+        const category = product.category || {};
+        const restaurant = category.restaurant || {};
+        
+        // Calcular desconto se em promoção
+        let discountPercent = 0;
+        if (product.is_on_promotion && product.current_price < product.regular_price) {
+            discountPercent = Math.round(((product.regular_price - product.current_price) / product.regular_price) * 100);
+        }
+        
+        return `
+            <div class="product-card">
+                <div class="product-header">
+                    <div class="product-title">
+                        <h3>${product.name}</h3>
+                        <div class="product-category">
+                            <ion-icon name="pricetags-outline"></ion-icon>
+                            ${category.name || 'Categoria não encontrada'}
+                        </div>
+                        <div class="product-category">
+                            <ion-icon name="storefront-outline"></ion-icon>
+                            ${restaurant.name || 'Restaurante não encontrado'}
+                        </div>
+                    </div>
+                    <div class="product-status-badges">
+                        <span class="status ${product.is_available ? 'available' : 'unavailable'}">
+                            ${product.is_available ? 'Disponível' : 'Indisponível'}
+                        </span>
+                        ${product.is_on_promotion ? '<span class="status promotion">Promoção</span>' : ''}
+                    </div>
+                </div>
+                
+                <div class="product-price">
+                    ${product.is_on_promotion ? `
+                        <div class="price-promotion">
+                            <span class="price-current">${formatPrice(product.current_price)} MT</span>
+                            <span class="price-old">${formatPrice(product.regular_price)} MT</span>
+                            ${discountPercent > 0 ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
+                        </div>
+                    ` : `
+                        <div class="price-regular">${formatPrice(product.current_price)} MT</div>
+                    `}
+                </div>
+                
+                ${product.description ? `
+                    <div class="product-description">
+                        ${product.description.length > 100 
+                            ? product.description.substring(0, 100) + '...' 
+                            : product.description}
+                    </div>
+                ` : ''}
+                
+                <div class="product-meta">
+                    <p><ion-icon name="calendar-outline"></ion-icon> ${formatDate(product.created_at)}</p>
+                    <p><ion-icon name="list-outline"></ion-icon> Ordem: ${product.sort_order || 0}</p>
+                </div>
+                
+                <div class="product-actions">
+                    <button class="btn-sm btn-edit" onclick="editProduct(${product.id})" title="Editar">
+                        <ion-icon name="create-outline"></ion-icon>
+                    </button>
+                    <button class="btn-sm btn-secondary" onclick="duplicateProduct(${product.id})" title="Duplicar">
+                        <ion-icon name="copy-outline"></ion-icon>
+                    </button>
+                    <button class="btn-sm ${product.is_on_promotion ? 'btn-warning' : 'btn-success'}" 
+                            onclick="toggleProductPromotion(${product.id}, ${product.is_on_promotion})" 
+                            title="${product.is_on_promotion ? 'Remover Promoção' : 'Aplicar Promoção'}">
+                        <ion-icon name="${product.is_on_promotion ? 'pricetag' : 'pricetag-outline'}"></ion-icon>
+                    </button>
+                    <button class="btn-sm ${product.is_available ? 'btn-warning' : 'btn-success'}" 
+                            onclick="toggleProductStatus(${product.id}, ${product.is_available})" 
+                            title="${product.is_available ? 'Indisponibilizar' : 'Disponibilizar'}">
+                        <ion-icon name="${product.is_available ? 'pause-outline' : 'play-outline'}"></ion-icon>
+                    </button>
+                    <button class="btn-sm btn-delete" onclick="deleteProduct(${product.id})" title="Deletar">
+                        <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Abrir modal de produto (criar/editar)
+ */
+function openProductModal(data = null) {
+    const modal = document.getElementById('productModal');
+    const title = document.getElementById('productModalTitle');
+    const form = document.getElementById('productForm');
+    
+    currentEditId = data ? data.id : null;
+    title.textContent = data ? 'Editar Produto' : 'Novo Produto';
+    
+    // Popular select de categorias
+    const categorySelect = document.getElementById('productCategory');
+    categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>';
+    allCategoriesForProducts.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = `${category.name} (${category.restaurant?.name || 'Sem restaurante'})`;
+        categorySelect.appendChild(option);
+    });
+    
+    if (data) {
+        document.getElementById('productCategory').value = data.category_id;
+        document.getElementById('productName').value = data.name || '';
+        document.getElementById('productDescription').value = data.description || '';
+        document.getElementById('productRegularPrice').value = data.regular_price || '';
+        document.getElementById('productCurrentPrice').value = data.current_price || '';
+        document.getElementById('productSortOrder').value = data.sort_order || '';
+        document.getElementById('productImage').value = data.image_url || '';
+        document.getElementById('productPromotion').checked = data.is_on_promotion || false;
+        document.getElementById('productAvailable').checked = data.is_available !== false;
+    } else {
+        form.reset();
+        document.getElementById('productAvailable').checked = true;
+    }
+    
+    modal.style.display = 'block';
+}
+
+/**
+ * Salvar produto (criar/editar)
+ */
+async function saveProduct(formData) {
+    try {
+        showLoading(true);
+        
+        const method = currentEditId ? 'PUT' : 'POST';
+        const url = currentEditId 
+            ? `${apiBaseUrl}/products/${currentEditId}` 
+            : `${apiBaseUrl}/products`;
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(currentEditId ? 'Produto atualizado com sucesso!' : 'Produto criado com sucesso!');
+            closeModal('product');
+            await loadProducts();
+            await loadStats(); // Atualizar estatísticas
+        } else {
+            throw new Error(data.message || 'Erro ao salvar produto');
+        }
+    } catch (error) {
+        showError('Erro ao salvar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * Editar produto
+ */
+async function editProduct(id) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/products/${id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            openProductModal(data.data);
+        } else {
+            throw new Error('Produto não encontrado');
+        }
+    } catch (error) {
+        showError('Erro ao carregar produto: ' + error.message);
+    }
+}
+
+/**
+ * Deletar produto
+ */
+async function deleteProduct(id) {
+    const product = allProductsData.find(p => p.id === id);
+    if (!product) return;
+    
+    const confirmMsg = `Tem certeza que deseja deletar o produto "${product.name}"?\n\nEsta ação não pode ser desfeita.`;
+    
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${apiBaseUrl}/products/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess('Produto deletado com sucesso!');
+            await loadProducts();
+            await loadStats();
+        } else {
+            throw new Error(data.message || 'Erro ao deletar produto');
+        }
+    } catch (error) {
+        showError('Erro ao deletar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * Duplicar produto
+ */
+async function duplicateProduct(id) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/products/${id}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error('Produto não encontrado');
+        }
+        
+        const product = data.data;
+        const newName = prompt(`Duplicar produto "${product.name}"\n\nNovo nome:`, `${product.name} (Cópia)`);
+        
+        if (!newName || newName.trim() === '') return;
+        
+        showLoading(true);
+        
+        const duplicateResponse = await fetch(`${apiBaseUrl}/products/${id}/duplicate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName.trim() })
+        });
+        
+        const duplicateData = await duplicateResponse.json();
+        
+        if (duplicateData.success) {
+            showSuccess('Produto duplicado com sucesso!');
+            await loadProducts();
+        } else {
+            throw new Error(duplicateData.message || 'Erro ao duplicar produto');
+        }
+    } catch (error) {
+        showError('Erro ao duplicar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+
+/**
+ * Alternar status de disponibilidade do produto
+ */
+async function toggleProductStatus(id, currentStatus) {
+    try {
+        showLoading(true);
+        
+        const endpoint = currentStatus 
+            ? `${apiBaseUrl}/products/${id}` // DELETE para indisponibilizar
+            : `${apiBaseUrl}/products/${id}/reactivate`; // PATCH para reativar
+        
+        const method = currentStatus ? 'DELETE' : 'PATCH';
+        
+        const response = await fetch(endpoint, { method });
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`Produto ${currentStatus ? 'indisponibilizado' : 'disponibilizado'} com sucesso!`);
+            await loadProducts();
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showError('Erro: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+
+/**
+ * Alternar promoção do produto
+ */
+async function toggleProductPromotion(id, isOnPromotion) {
+    try {
+        let promotionPrice = null;
+        
+        if (!isOnPromotion) {
+            // Aplicar promoção - pedir preço promocional
+            const product = allProductsData.find(p => p.id === id);
+            const priceInput = prompt(
+                `Aplicar promoção ao produto "${product.name}"\n\nPreço regular: ${product.regular_price} MT\nDigite o novo preço promocional:`,
+                (product.regular_price * 0.8).toFixed(2) // Sugerir 20% de desconto
+            );
+            
+            if (!priceInput) return;
+            
+            promotionPrice = parseFloat(priceInput);
+            
+            if (isNaN(promotionPrice) || promotionPrice <= 0 || promotionPrice >= product.regular_price) {
+                showError('Preço promocional deve ser um número válido e menor que o preço regular');
+                return;
+            }
+        }
+        
+        showLoading(true);
+        
+        const response = await fetch(`${apiBaseUrl}/products/${id}/promotion`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ promotion_price: promotionPrice })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`Promoção ${isOnPromotion ? 'removida' : 'aplicada'} com sucesso!`);
+            await loadProducts();
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showError('Erro: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+
+/**
+ * Popular filtros de produtos
+ */
+function populateProductFilters() {
+    // Popular filtro de categorias
+    const categoryFilter = document.getElementById('productCategoryFilter');
+    categoryFilter.innerHTML = '<option value="">Todas</option>';
+    
+    const uniqueCategories = [...new Set(allProductsData
+        .filter(product => product.category)
+        .map(product => JSON.stringify({
+            id: product.category.id, 
+            name: product.category.name,
+            restaurant: product.category.restaurant?.name || 'Sem restaurante'
+        }))
+    )].map(str => JSON.parse(str));
+    
+    uniqueCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = `${category.name} (${category.restaurant})`;
+        categoryFilter.appendChild(option);
+    });
+    
+    // Popular filtro de restaurantes
+    const restaurantFilter = document.getElementById('productRestaurantFilter');
+    restaurantFilter.innerHTML = '<option value="">Todos</option>';
+    
+    const uniqueRestaurants = [...new Set(allProductsData
+        .filter(product => product.category?.restaurant)
+        .map(product => JSON.stringify({
+            id: product.category.restaurant.id,
+            name: product.category.restaurant.name
+        }))
+    )].map(str => JSON.parse(str));
+    
+    uniqueRestaurants.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantFilter.appendChild(option);
+    });
+}
+
+/**
+ * Aplicar filtros de produtos
+ */
+function applyProductFilters() {
+    const searchTerm = document.getElementById('productSearch')?.value.toLowerCase() || '';
+    const categoryFilter = document.getElementById('productCategoryFilter')?.value || '';
+    const restaurantFilter = document.getElementById('productRestaurantFilter')?.value || '';
+    const statusFilter = document.getElementById('productStatusFilter')?.value || '';
+    const promotionFilter = document.getElementById('productPromotionFilter')?.value || '';
+    
+    let filteredProducts = [...allProductsData];
+    
+    // Aplicar filtro de busca
+    if (searchTerm) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.name.toLowerCase().includes(searchTerm) ||
+            (product.description && product.description.toLowerCase().includes(searchTerm)) ||
+            (product.category && product.category.name.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    // Aplicar filtro de categoria
+    if (categoryFilter) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.category_id.toString() === categoryFilter
+        );
+    }
+    
+    // Aplicar filtro de restaurante
+    if (restaurantFilter) {
+        filteredProducts = filteredProducts.filter(product =>
+            product.category?.restaurant_id?.toString() === restaurantFilter
+        );
+    }
+    
+    // Aplicar filtro de status
+    if (statusFilter !== '') {
+        const isAvailable = statusFilter === 'true';
+        filteredProducts = filteredProducts.filter(product =>
+            product.is_available === isAvailable
+        );
+    }
+    
+    // Aplicar filtro de promoção
+    if (promotionFilter !== '') {
+        const isOnPromotion = promotionFilter === 'true';
+        filteredProducts = filteredProducts.filter(product =>
+            product.is_on_promotion === isOnPromotion
+        );
+    }
+    
+    displayProducts(filteredProducts);
+}
+
+
+/**
+ * Limpar filtros de produtos
+ */
+function clearProductFilters() {
+    document.getElementById('productSearch').value = '';
+    document.getElementById('productCategoryFilter').value = '';
+    document.getElementById('productRestaurantFilter').value = '';
+    document.getElementById('productStatusFilter').value = '';
+    document.getElementById('productPromotionFilter').value = '';
+    applyProductFilters();
+}
+
+
+/**
+ * Configurar event listeners dos filtros
+ */
+function setupProductFilters() {
+    const searchInput = document.getElementById('productSearch');
+    const categoryFilter = document.getElementById('productCategoryFilter');
+    const restaurantFilter = document.getElementById('productRestaurantFilter');
+    const statusFilter = document.getElementById('productStatusFilter');
+    const promotionFilter = document.getElementById('productPromotionFilter');
+    
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyProductFilters, 300);
+        });
+    }
+    
+    [categoryFilter, restaurantFilter, statusFilter, promotionFilter].forEach(filter => {
+        if (filter) {
+            filter.addEventListener('change', applyProductFilters);
+        }
+    });
+}
+
+function validateProductForm() {
+    const categoryId = document.getElementById('productCategory').value;
+    const name = document.getElementById('productName').value.trim();
+    const regularPrice = parseFloat(document.getElementById('productRegularPrice').value);
+    const currentPrice = parseFloat(document.getElementById('productCurrentPrice').value);
+    const isOnPromotion = document.getElementById('productPromotion').checked;
+    
+    if (!categoryId) {
+        showError('Selecione uma categoria');
+        return false;
+    }
+    
+    if (!name) {
+        showError('Nome do produto é obrigatório');
+        return false;
+    }
+    
+    if (!regularPrice || regularPrice <= 0) {
+        showError('Preço regular deve ser maior que zero');
+        return false;
+    }
+    
+    if (currentPrice && currentPrice <= 0) {
+        showError('Preço atual deve ser maior que zero');
+        return false;
+    }
+    
+    if (isOnPromotion && currentPrice && currentPrice >= regularPrice) {
+        showError('Preço promocional deve ser menor que o preço regular');
+        return false;
+    }
+    
+    return true;
+}
+
+// 8. Melhorar o formulário de produtos com validação em tempo real
+function setupProductFormValidation() {
+    const regularPriceInput = document.getElementById('productRegularPrice');
+    const currentPriceInput = document.getElementById('productCurrentPrice');
+    const promotionCheckbox = document.getElementById('productPromotion');
+    
+    // Auto-preencher preço atual quando preço regular for alterado
+    regularPriceInput.addEventListener('input', () => {
+        const regularPrice = parseFloat(regularPriceInput.value);
+        if (regularPrice && !currentPriceInput.value) {
+            currentPriceInput.value = regularPrice.toFixed(2);
+        }
+    });
+    
+    // Validar preços quando preço atual for alterado
+    currentPriceInput.addEventListener('input', () => {
+        const regularPrice = parseFloat(regularPriceInput.value);
+        const currentPrice = parseFloat(currentPriceInput.value);
+        
+        if (regularPrice && currentPrice && currentPrice < regularPrice) {
+            promotionCheckbox.checked = true;
+        } else if (regularPrice && currentPrice && currentPrice >= regularPrice) {
+            promotionCheckbox.checked = false;
+        }
+    });
+    
+    // Ajustar preço atual quando promoção for marcada/desmarcada
+    promotionCheckbox.addEventListener('change', () => {
+        const regularPrice = parseFloat(regularPriceInput.value);
+        
+        if (promotionCheckbox.checked && regularPrice) {
+            // Sugerir 20% de desconto
+            const suggestedPrice = (regularPrice * 0.8).toFixed(2);
+            if (!currentPriceInput.value || parseFloat(currentPriceInput.value) >= regularPrice) {
+                currentPriceInput.value = suggestedPrice;
+            }
+        } else if (!promotionCheckbox.checked && regularPrice) {
+            currentPriceInput.value = regularPrice.toFixed(2);
+        }
+    });
+}
+
+/**
+ * Configurar formulário de produtos
+ */
+function setupProductForm() {
+    const form = document.getElementById('productForm');
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Validar formulário
+        if (!validateProductForm()) {
+            return;
+        }
+        
+        const formData = {
+            category_id: parseInt(document.getElementById('productCategory').value),
+            name: document.getElementById('productName').value.trim(),
+            description: document.getElementById('productDescription').value.trim(),
+            regular_price: parseFloat(document.getElementById('productRegularPrice').value),
+            current_price: parseFloat(document.getElementById('productCurrentPrice').value) || 
+                          parseFloat(document.getElementById('productRegularPrice').value),
+            sort_order: parseInt(document.getElementById('productSortOrder').value) || 0,
+            image_url: document.getElementById('productImage').value.trim(),
+            is_on_promotion: document.getElementById('productPromotion').checked,
+            is_available: document.getElementById('productAvailable').checked
+        };
+        
+        await saveProduct(formData);
+    });
+    
+    // Configurar validação em tempo real
+    setupProductFormValidation();
+}
+
+
+/**
+ * Formatar preço
+ */
+function formatPrice(price) {
+    return parseFloat(price).toFixed(2);
+}
+
+
+async function getProductsByCategory(categoryId) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/categories/${categoryId}/products`);
+        const data = await response.json();
+        
+        if (data.success) {
+            return data.data || [];
+        }
+        return [];
+    } catch (error) {
+        console.error('Erro ao buscar produtos da categoria:', error);
+        return [];
+    }
+}
+
+// 13. Função para buscar produtos por restaurante
+async function getProductsByRestaurant(restaurantId) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/restaurants/${restaurantId}/products`);
+        const data = await response.json();
+        
+        if (data.success) {
+            return data.data || [];
+        }
+        return [];
+    } catch (error) {
+        console.error('Erro ao buscar produtos do restaurante:', error);
+        return [];
+    }
+}
+
+// 14. Função para mover produto para outra categoria
+async function moveProductToCategory(productId, newCategoryId) {
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${apiBaseUrl}/products/${productId}/move`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category_id: newCategoryId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess('Produto movido com sucesso!');
+            await loadProducts();
+            return true;
+        } else {
+            throw new Error(data.message || 'Erro ao mover produto');
+        }
+    } catch (error) {
+        showError('Erro ao mover produto: ' + error.message);
+        return false;
     } finally {
         showLoading(false);
     }
