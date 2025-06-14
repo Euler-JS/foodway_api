@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 // Importar middlewares customizados
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
@@ -12,7 +13,25 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares de segurança
-app.use(helmet());
+// app.use(helmet());
+
+app.use(
+ helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://unpkg.com"
+      ],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://unpkg.com"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'", "https://unpkg.com"], // 🚨 esta linha é essencial
+    },
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -46,15 +65,30 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Rota específica para o dashboard admin
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// Rota para acessar o dashboard diretamente
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+
 // Rota raiz
 app.get('/', (req, res) => {
   res.json({
     message: 'Restaurant Menu API',
     version: process.env.API_VERSION || 'v1',
     documentation: '/api/docs',
-    health: '/health'
+    health: '/health',
+    dashboard: '/dashboard',
+    admin: '/admin'
   });
 });
+
+
 
 // Importar e usar rotas
 const restaurantRoutes = require('./routes/restaurants');
