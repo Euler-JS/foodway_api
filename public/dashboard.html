@@ -19,7 +19,7 @@
         }
 
         :root {
-            --blue: #2a2185;
+            /* --primary-color: #2a2185; */
             --white: #fff;
             --gray: #f5f5f5;
             --black1: #222;
@@ -28,6 +28,8 @@
             --orange: #FF9800;
             --red: #f44336;
             --purple: #9C27B0;
+            --primary-color: #FF7043;
+            --secondary-color: #FF5722;
         }
 
         body {
@@ -45,8 +47,8 @@
             position: fixed;
             width: 300px;
             height: 100%;
-            background: var(--blue);
-            border-left: 10px solid var(--blue);
+            background: var(--primary-color);
+            border-left: 10px solid var(--primary-color);
             transition: 0.5s;
             overflow: hidden;
             z-index: 1000;
@@ -91,7 +93,7 @@
         }
         .navigation ul li:hover a,
         .navigation ul li.hovered a {
-            color: var(--blue);
+            color: var(--primary-color);
         }
 
         .navigation ul li a .icon {
@@ -216,7 +218,7 @@
             border-radius: 50%;
             overflow: hidden;
             cursor: pointer;
-            background: var(--blue);
+            background: var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -254,7 +256,7 @@
             position: relative;
             font-weight: 500;
             font-size: 2.5rem;
-            color: var(--blue);
+            color: var(--primary-color);
         }
 
         .cardBox .card .cardName {
@@ -269,7 +271,7 @@
         }
 
         .cardBox .card:hover {
-            background: var(--blue);
+            background: var(--primary-color);
         }
         .cardBox .card:hover .numbers,
         .cardBox .card:hover .cardName,
@@ -305,12 +307,12 @@
         }
         .cardHeader h2 {
             font-weight: 600;
-            color: var(--blue);
+            color: var(--primary-color);
         }
         .cardHeader .btn {
             position: relative;
             padding: 8px 15px;
-            background: var(--blue);
+            background: var(--primary-color);
             text-decoration: none;
             color: var(--white);
             border-radius: 8px;
@@ -342,7 +344,7 @@
             border-bottom: none;
         }
         .details .recentOrders table tbody tr:hover {
-            background: var(--blue);
+            background: var(--primary-color);
             color: var(--white);
         }
         .details .recentOrders table tr td {
@@ -441,11 +443,11 @@
         }
 
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            border-color: var(--blue);
+            border-color: var(--primary-color);
         }
 
         .btn-primary {
-            background: var(--blue);
+            background: var(--primary-color);
             color: var(--white);
             padding: 12px 30px;
             border: none;
@@ -482,7 +484,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--blue);
+            border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -598,7 +600,7 @@
         }
 
         .restaurant-card h3 {
-            color: var(--blue);
+            color: var(--primary-color);
             margin-bottom: 10px;
         }
 
@@ -622,7 +624,7 @@
         }
 
         .btn-edit {
-            background: var(--blue);
+            background: var(--primary-color);
             color: var(--white);
         }
 
@@ -635,6 +637,66 @@
             background: var(--green);
             color: var(--white);
         }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.category-info {
+    margin-bottom: 20px;
+}
+
+.category-info p {
+    margin: 5px 0;
+    color: var(--black2);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.category-info .description {
+    color: var(--black1);
+    font-style: italic;
+    margin: 10px 0;
+}
+
+.category-info .created-date {
+    font-size: 0.9rem;
+    color: var(--black2);
+}
+
+.category-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-warning {
+    background: var(--orange);
+    color: var(--white);
+}
     </style>
 </head>
 
@@ -648,7 +710,7 @@
                         <span class="icon">
                             <ion-icon name="restaurant-outline"></ion-icon>
                         </span>
-                        <span class="title">Restaurant Admin</span>
+                        <span class="title">Manna Software</span>
                     </a>
                 </li>
 
@@ -857,30 +919,68 @@
             </div>
 
             <!-- ======================= Other Sections ================== -->
-            <div class="content-section" id="categories">
-                <div style="padding: 20px;">
-                    <h2 style="color: var(--blue); margin-bottom: 20px;">Gestão de Categorias</h2>
-                    <p>Interface de categorias em desenvolvimento...</p>
+            <!-- No dashboard.html, atualize a seção de categorias para incluir filtros -->
+<div class="content-section" id="categories">
+    <div style="padding: 20px;">
+        <div class="cardHeader" style="margin-bottom: 30px;">
+            <h2>Gestão de Categorias</h2>
+            <button class="btn" onclick="openModal('category')">
+                <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                Nova Categoria
+            </button>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="filters-bar" style="background: var(--white); padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="filter-group">
+                    <label>Buscar:</label>
+                    <input type="text" id="categorySearch" placeholder="Nome da categoria..." style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
                 </div>
+                <div class="filter-group">
+                    <label>Restaurante:</label>
+                    <select id="categoryRestaurantFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="categoryStatusFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="clearCategoryFilters()" style="padding: 8px 15px;">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    Limpar
+                </button>
             </div>
+        </div>
+        
+        <div class="category-grid" id="categoryGrid">
+            <!-- Categories will be loaded here -->
+        </div>
+    </div>
+</div>
 
             <div class="content-section" id="products">
                 <div style="padding: 20px;">
-                    <h2 style="color: var(--blue); margin-bottom: 20px;">Gestão de Produtos</h2>
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px;">Gestão de Produtos</h2>
                     <p>Interface de produtos em desenvolvimento...</p>
                 </div>
             </div>
 
             <div class="content-section" id="menu">
                 <div style="padding: 20px;">
-                    <h2 style="color: var(--blue); margin-bottom: 20px;">Preview do Menu</h2>
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px;">Preview do Menu</h2>
                     <p>Visualização do menu em desenvolvimento...</p>
                 </div>
             </div>
 
             <div class="content-section" id="api">
                 <div style="padding: 20px;">
-                    <h2 style="color: var(--blue); margin-bottom: 20px;">Documentação da API</h2>
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px;">Documentação da API</h2>
                     <div style="background: var(--white); padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                         <h3>Endpoints Principais:</h3>
                         <ul style="margin: 20px 0; line-height: 2;">
@@ -935,6 +1035,38 @@
             </form>
         </div>
     </div>
+
+    <!-- Category Modal -->
+<div id="categoryModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('category')">&times;</span>
+        <h2 id="categoryModalTitle">Nova Categoria</h2>
+        <form id="categoryForm">
+            <div class="form-group">
+                <label for="categoryRestaurant">Restaurante *</label>
+                <select id="categoryRestaurant" name="restaurant_id" required>
+                    <option value="">Selecione um restaurante</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="categoryName">Nome *</label>
+                <input type="text" id="categoryName" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="categoryDescription">Descrição</label>
+                <textarea id="categoryDescription" name="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="categoryImage">URL da Imagem</label>
+                <input type="url" id="categoryImage" name="image_url">
+            </div>
+            <div style="text-align: right; margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closeModal('category')">Cancelar</button>
+                <button type="submit" class="btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
 
     <!-- =========== Scripts =========  -->
     <script>
@@ -995,12 +1127,18 @@
                 const response = await fetch(`${apiBaseUrl}/restaurants/stats`);
                 const data = await response.json();
                 
+                const responseCategories = await fetch(`${apiBaseUrl}/categories/stats`);
+                const dataCategories = await responseCategories.json();
+                
                 if (data.success) {
                     document.getElementById('restaurantCount').textContent = data.data?.active || 0;
                     // You can load other stats here
-                    document.getElementById('categoryCount').textContent = '0';
                     document.getElementById('productCount').textContent = '0';
                     document.getElementById('promotionCount').textContent = '0';
+                }
+
+                if (dataCategories.success) {
+                    document.getElementById('categoryCount').textContent = dataCategories.data?.active || 0;
                 }
             } catch (error) {
                 showError('Erro ao carregar estatísticas: ' + error.message);
@@ -1130,12 +1268,44 @@
                 }
                 
                 modal.style.display = 'block';
-            }
+            } else if (type === 'category') {
+        const modal = document.getElementById('categoryModal');
+        const title = document.getElementById('categoryModalTitle');
+        const form = document.getElementById('categoryForm');
+        
+        currentEditId = data ? data.id : null;
+        title.textContent = data ? 'Editar Categoria' : 'Nova Categoria';
+        
+        // Populate restaurant select
+        const restaurantSelect = document.getElementById('categoryRestaurant');
+        restaurantSelect.innerHTML = '<option value="">Selecione um restaurante</option>';
+        restaurantsData.forEach(restaurant => {
+            const option = document.createElement('option');
+            option.value = restaurant.id;
+            option.textContent = restaurant.name;
+            restaurantSelect.appendChild(option);
+        });
+        
+        if (data) {
+            document.getElementById('categoryRestaurant').value = data.restaurant_id;
+            document.getElementById('categoryName').value = data.name || '';
+            document.getElementById('categoryDescription').value = data.description || '';
+            document.getElementById('categoryImage').value = data.image_url || '';
+        } else {
+            form.reset();
+        }
+        
+        modal.style.display = 'block';
+    }
         }
 
-        function closeModal() {
-            document.getElementById('restaurantModal').style.display = 'none';
-            currentEditId = null;
+        function closeModal(type) {
+            if (type === 'restaurant') {
+                document.getElementById('restaurantModal').style.display = 'none';
+            } else if (type === 'category') {
+                    document.getElementById('categoryModal').style.display = 'none';
+                }
+    currentEditId = null;
         }
 
         // CRUD Operations
@@ -1293,12 +1463,470 @@
             // Load initial data
             await loadStats();
             await loadRestaurants();
+            await loadCategories();
+
+            setTimeout(setupCategoryFilters, 500);
             
             // Auto-refresh every 5 minutes
             setInterval(async () => {
                 await loadStats();
             }, 5 * 60 * 1000);
         });
+
+        //Categorias
+
+        // Categories functions
+        async function loadCategories() {
+            try {
+                showLoading(true);
+                const response = await fetch(`${apiBaseUrl}/categories`);
+                const data = await response.json();
+
+
+                console.log("Dados de Categorias:", data);
+                
+                if (data.success && data.data && data.data.data) {
+                    displayCategories(data.data.data);
+                }
+            } catch (error) {
+                showError('Erro ao carregar categorias');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+       function displayCategories(categories) {
+    const grid = document.getElementById('categoryGrid');
+    
+    if (!categories || categories.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <ion-icon name="pricetags-outline" style="font-size: 3rem; color: var(--black2); margin-bottom: 15px;"></ion-icon>
+                <h3 style="color: var(--black2); margin-bottom: 10px;">Nenhuma categoria encontrada</h3>
+                <p style="color: var(--black2); margin-bottom: 20px;">Tente ajustar os filtros ou criar uma nova categoria</p>
+                <button class="btn-primary" onclick="openModal('category')">
+                    <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                    Criar Categoria
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = categories.map(category => `
+        <div class="category-card">
+            <div class="category-header">
+                <div>
+                    <h3>${category.name}</h3>
+                    <div class="category-meta">
+                        <span class="sort-order">Ordem: ${category.sort_order || 0}</span>
+                    </div>
+                </div>
+                <span class="status ${category.is_active ? 'active' : 'inactive'}">
+                    ${category.is_active ? 'Ativo' : 'Inativo'}
+                </span>
+            </div>
+            
+            <div class="category-info">
+                <p class="restaurant-info">
+                    <ion-icon name="storefront-outline"></ion-icon> 
+                    ${category.restaurant?.name || 'Restaurante não encontrado'}
+                </p>
+                
+                ${category.description ? `
+                    <p class="description">${category.description.length > 100 
+                        ? category.description.substring(0, 100) + '...' 
+                        : category.description}</p>
+                ` : '<p class="no-description">Sem descrição</p>'}
+                
+                <div class="category-stats">
+                    <span><ion-icon name="calendar-outline"></ion-icon> ${formatDate(category.created_at)}</span>
+                    <span class="products-count" data-category-id="${category.id}">
+                        <ion-icon name="fast-food-outline"></ion-icon> 
+                        <span class="count">...</span> produtos
+                    </span>
+                </div>
+            </div>
+            
+            <div class="category-actions">
+                <button class="btn-sm btn-edit" onclick="editCategory(${category.id})" title="Editar">
+                    <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button class="btn-sm btn-success" onclick="viewCategoryProducts(${category.id})" title="Ver Produtos">
+                    <ion-icon name="list-outline"></ion-icon>
+                </button>
+                <button class="btn-sm btn-secondary" onclick="duplicateCategory(${category.id})" title="Duplicar">
+                    <ion-icon name="copy-outline"></ion-icon>
+                </button>
+                <button class="btn-sm ${category.is_active ? 'btn-warning' : 'btn-success'}" 
+                        onclick="toggleCategoryStatus(${category.id}, ${category.is_active})" 
+                        title="${category.is_active ? 'Inativar' : 'Ativar'}">
+                    <ion-icon name="${category.is_active ? 'pause-outline' : 'play-outline'}"></ion-icon>
+                </button>
+                <button class="btn-sm btn-delete" onclick="deleteCategory(${category.id})" title="Deletar">
+                    <ion-icon name="trash-outline"></ion-icon>
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Load product counts
+    loadCategoryProductCounts();
+}
+
+// Function to load product counts for each category
+async function loadCategoryProductCounts() {
+    const countElements = document.querySelectorAll('.products-count');
+    
+    countElements.forEach(async (element) => {
+        const categoryId = element.dataset.categoryId;
+        try {
+            const response = await fetch(`${apiBaseUrl}/categories/${categoryId}/products/stats`);
+            const data = await response.json();
+            
+            if (data.success && data.data) {
+                const countSpan = element.querySelector('.count');
+                countSpan.textContent = data.data.total || 0;
+            }
+        } catch (error) {
+            console.error(`Error loading product count for category ${categoryId}:`, error);
+            const countSpan = element.querySelector('.count');
+            countSpan.textContent = '0';
+        }
+    });
+}
+
+        // Adicione esta função no final do JavaScript
+document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        restaurant_id: parseInt(document.getElementById('categoryRestaurant').value),
+        name: document.getElementById('categoryName').value,
+        description: document.getElementById('categoryDescription').value,
+        image_url: document.getElementById('categoryImage').value
+    };
+    
+    await saveCategory(formData);
+});
+
+async function saveCategory(formData) {
+    try {
+        showLoading(true);
+        
+        const method = currentEditId ? 'PUT' : 'POST';
+        const url = currentEditId 
+            ? `${apiBaseUrl}/categories/${currentEditId}` 
+            : `${apiBaseUrl}/categories`;
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(currentEditId ? 'Categoria atualizada!' : 'Categoria criada!');
+            closeModal('category');
+            await loadCategories();
+        } else {
+            throw new Error(data.message || 'Erro ao salvar categoria');
+        }
+    } catch (error) {
+        showError('Erro: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Category CRUD functions
+async function editCategory(id) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/categories/${id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            openModal('category', data.data);
+        } else {
+            throw new Error('Categoria não encontrada');
+        }
+    } catch (error) {
+        showError('Erro ao carregar categoria: ' + error.message);
+    }
+}
+
+async function deleteCategory(id) {
+    // Buscar dados da categoria para confirmação
+    try {
+        const response = await fetch(`${apiBaseUrl}/categories/${id}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error('Categoria não encontrada');
+        }
+        
+        const category = data.data;
+        const confirmMsg = `Tem certeza que deseja deletar a categoria "${category.name}"?\n\nEsta ação não pode ser desfeita.`;
+        
+        if (!confirm(confirmMsg)) return;
+        
+        showLoading(true);
+        
+        const deleteResponse = await fetch(`${apiBaseUrl}/categories/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const deleteData = await deleteResponse.json();
+        
+        if (deleteData.success) {
+            showSuccess('Categoria deletada com sucesso!');
+            await loadCategories();
+        } else {
+            throw new Error(deleteData.message || 'Erro ao deletar categoria');
+        }
+    } catch (error) {
+        showError('Erro ao deletar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function toggleCategoryStatus(id, currentStatus) {
+    try {
+        showLoading(true);
+        
+        const endpoint = currentStatus 
+            ? `${apiBaseUrl}/categories/${id}` // DELETE para inativar
+            : `${apiBaseUrl}/categories/${id}/reactivate`; // PATCH para reativar
+        
+        const method = currentStatus ? 'DELETE' : 'PATCH';
+        
+        const response = await fetch(endpoint, { method });
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`Categoria ${currentStatus ? 'inativada' : 'reativada'} com sucesso!`);
+            await loadCategories();
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showError('Erro: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+function displayCategories(categories) {
+    const grid = document.getElementById('categoryGrid');
+    
+    if (!categories || categories.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <ion-icon name="pricetags-outline" style="font-size: 3rem; color: var(--black2);"></ion-icon>
+                <h3 style="color: var(--black2); margin: 15px 0;">Nenhuma categoria encontrada</h3>
+                <button class="btn-primary" onclick="openModal('category')">
+                    <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                    Criar Primeira Categoria
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = categories.map(category => `
+        <div class="category-card">
+            <div class="category-header">
+                <h3>${category.name}</h3>
+                <span class="status ${category.is_active ? 'active' : 'inactive'}">
+                    ${category.is_active ? 'Ativo' : 'Inativo'}
+                </span>
+            </div>
+            <div class="category-info">
+                <p><ion-icon name="storefront-outline"></ion-icon> ${category.restaurant?.name || 'Restaurante não encontrado'}</p>
+                ${category.description ? `<p class="description">${category.description}</p>` : ''}
+                <p class="created-date">Criado em ${formatDate(category.created_at)}</p>
+            </div>
+            <div class="category-actions">
+                <button class="btn-sm btn-edit" onclick="editCategory(${category.id})" title="Editar">
+                    <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button class="btn-sm btn-view" onclick="viewCategoryProducts(${category.id})" title="Ver Produtos">
+                    <ion-icon name="list-outline"></ion-icon>
+                </button>
+                <button class="btn-sm ${category.is_active ? 'btn-warning' : 'btn-success'}" 
+                        onclick="toggleCategoryStatus(${category.id}, ${category.is_active})" 
+                        title="${category.is_active ? 'Inativar' : 'Ativar'}">
+                    <ion-icon name="${category.is_active ? 'pause-outline' : 'play-outline'}"></ion-icon>
+                </button>
+                <button class="btn-sm btn-delete" onclick="deleteCategory(${category.id})" title="Deletar">
+                    <ion-icon name="trash-outline"></ion-icon>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Função auxiliar para formatar data
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+}
+
+// Função para ver produtos da categoria
+function viewCategoryProducts(categoryId) {
+    // Por enquanto, abre uma nova aba com a API
+    window.open(`${apiBaseUrl}/categories/${categoryId}/products`, '_blank');
+}
+
+// Category filtering system
+let allCategoriesData = []; // Store all categories for filtering
+
+async function loadCategories() {
+    try {
+        showLoading(true);
+        const response = await fetch(`${apiBaseUrl}/categories?limit=100`);
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.data) {
+            allCategoriesData = data.data.data;
+            populateCategoryFilters();
+            applyCategoryFilters();
+        } else {
+            allCategoriesData = [];
+            displayCategories([]);
+        }
+    } catch (error) {
+        showError('Erro ao carregar categorias');
+        allCategoriesData = [];
+        displayCategories([]);
+    } finally {
+        showLoading(false);
+    }
+}
+
+function populateCategoryFilters() {
+    const restaurantFilter = document.getElementById('categoryRestaurantFilter');
+    restaurantFilter.innerHTML = '<option value="">Todos</option>';
+    
+    // Get unique restaurants from categories
+    const uniqueRestaurants = [...new Set(allCategoriesData
+        .filter(cat => cat.restaurant)
+        .map(cat => JSON.stringify({id: cat.restaurant.id, name: cat.restaurant.name}))
+    )].map(str => JSON.parse(str));
+    
+    uniqueRestaurants.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantFilter.appendChild(option);
+    });
+}
+
+function applyCategoryFilters() {
+    const searchTerm = document.getElementById('categorySearch')?.value.toLowerCase() || '';
+    const restaurantFilter = document.getElementById('categoryRestaurantFilter')?.value || '';
+    const statusFilter = document.getElementById('categoryStatusFilter')?.value || '';
+    
+    let filteredCategories = [...allCategoriesData];
+    
+    // Apply search filter
+    if (searchTerm) {
+        filteredCategories = filteredCategories.filter(category =>
+            category.name.toLowerCase().includes(searchTerm) ||
+            (category.description && category.description.toLowerCase().includes(searchTerm)) ||
+            (category.restaurant && category.restaurant.name.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    // Apply restaurant filter
+    if (restaurantFilter) {
+        filteredCategories = filteredCategories.filter(category =>
+            category.restaurant_id.toString() === restaurantFilter
+        );
+    }
+    
+    // Apply status filter
+    if (statusFilter !== '') {
+        const isActive = statusFilter === 'true';
+        filteredCategories = filteredCategories.filter(category =>
+            category.is_active === isActive
+        );
+    }
+    
+    displayCategories(filteredCategories);
+}
+
+function clearCategoryFilters() {
+    document.getElementById('categorySearch').value = '';
+    document.getElementById('categoryRestaurantFilter').value = '';
+    document.getElementById('categoryStatusFilter').value = '';
+    applyCategoryFilters();
+}
+
+// Setup filter event listeners
+function setupCategoryFilters() {
+    const searchInput = document.getElementById('categorySearch');
+    const restaurantFilter = document.getElementById('categoryRestaurantFilter');
+    const statusFilter = document.getElementById('categoryStatusFilter');
+    
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyCategoryFilters, 300);
+        });
+    }
+    
+    if (restaurantFilter) {
+        restaurantFilter.addEventListener('change', applyCategoryFilters);
+    }
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', applyCategoryFilters);
+    }
+}
+
+async function duplicateCategory(id) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/categories/${id}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error('Categoria não encontrada');
+        }
+        
+        const category = data.data;
+        const newName = prompt(`Duplicar categoria "${category.name}"\n\nNovo nome:`, `${category.name} (Cópia)`);
+        
+        if (!newName || newName.trim() === '') return;
+        
+        showLoading(true);
+        
+        const duplicateResponse = await fetch(`${apiBaseUrl}/categories/${id}/duplicate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName.trim() })
+        });
+        
+        const duplicateData = await duplicateResponse.json();
+        
+        if (duplicateData.success) {
+            showSuccess('Categoria duplicada com sucesso!');
+            await loadCategories();
+        } else {
+            throw new Error(duplicateData.message || 'Erro ao duplicar categoria');
+        }
+    } catch (error) {
+        showError('Erro ao duplicar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+
     </script>
 
     <!-- ====== ionicons ======= -->
