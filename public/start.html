@@ -439,10 +439,14 @@
                 <a href="#contact">Contato</a>
             </div>
                             <nav class="flex items-center justify-end gap-4">
-                                            <a href="https://mannauniverse-aybw3.kinsta.app/login"
+                                            <button id="loginBtn" style="    background: transparent;
+    border: brown;
+    color: #FFF;
+    font-size: large;
+    font-weight: 900;"
                             class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal">
-                            Log in
-                        </a>
+                            Login
+                                            </button>
 
                                                             </nav>
                     </nav>
@@ -673,5 +677,14 @@
         </div>
     </footer>
 </body>
-
+<script>
+    const baseUrl = window.location.origin;
+    document.getElementById("loginBtn").addEventListener("click", function() {
+        login();
+    });
+    function login() {
+        // Implementar lógica de login aqui
+        window.open(baseUrl + "/login", "_self");
+    }
+</script>
 </html>

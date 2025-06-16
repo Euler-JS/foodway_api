@@ -75,6 +75,11 @@ app.get('/start', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'start.html'));
 });
 
+// Rota específica para o inicio da pagina
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 // Rota para acessar o dashboard diretamente
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
@@ -90,7 +95,8 @@ app.get('/', (req, res) => {
     health: '/health',
     dashboard: '/dashboard',
     admin: '/admin',
-    start: '/start'
+    start: '/start',
+    login: '/login'
   });
 });
 
