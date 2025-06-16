@@ -1553,13 +1553,14 @@
 
         // Modal Functions
         function openModal(type, data = null) {
-            const modal = document.getElementById('restaurantModal');
-            const title = document.getElementById('modalTitle');
-            const form = document.getElementById('restaurantForm');
             
-            currentEditId = data ? data.id : null;
             
             if (type === 'restaurant') {
+                const modal = document.getElementById('restaurantModal');
+                const title = document.getElementById('modalTitle');
+                const form = document.getElementById('restaurantForm');
+                
+                currentEditId = data ? data.id : null;
                 title.textContent = data ? 'Editar Restaurante' : 'Novo Restaurante';
                 
                 if (data) {
@@ -1597,7 +1598,10 @@
                     document.getElementById('categoryName').value = data.name || '';
                     document.getElementById('categoryDescription').value = data.description || '';
                     document.getElementById('categoryImage').value = data.image_url || '';
+                } else {
+                    form.reset();
                 }
+                modal.style.display = 'block';
         } else if (type === 'product') {
             openProductModal(data);
             return;
@@ -1779,7 +1783,7 @@
             initNavigation();
             setupSearch();
             setupForms();
-            setupProductForm();
+            // setupProductForm();
             
             // Load initial data
             await loadStats();
@@ -2887,7 +2891,7 @@ function setupProductForm() {
     
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+       
         // Validar formulário
         if (!validateProductForm()) {
             return;
