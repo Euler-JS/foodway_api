@@ -84,22 +84,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Rota específica para o dashboard admin (protegida)
-app.get('/dashboard', authenticate, (req, res) => {
-  // Verificar se é super admin
-  if (req.user.role !== 'super_admin') {
-    return res.status(403).send(`
-      <html>
-        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
-          <h1>🚫 Acesso Negado</h1>
-          <p>Apenas super administradores podem acessar o dashboard.</p>
-          <a href="/login" style="color: #FF5722;">Fazer Login</a>
-        </body>
-      </html>
-    `);
-  }
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
+
 
 // Rota específica para login de administrador
 app.get('/admin', (req, res) => {
@@ -114,6 +99,10 @@ app.get('/start', (req, res) => {
 // Rota para login geral
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 // Rota raiz
