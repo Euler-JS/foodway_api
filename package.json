@@ -1,7 +1,7 @@
 {
   "name": "restaurant-menu-api",
-  "version": "1.0.0",
-  "description": "Restaurant Menu Management API with Admin Dashboard",
+  "version": "2.0.0",
+  "description": "Restaurant Menu Management API with User Management and Authentication",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,7 +9,9 @@
     "build": "echo 'Build completed successfully'",
     "vercel-build": "echo 'Vercel build completed'",
     "test": "echo 'Tests would go here'",
-    "lint": "echo 'Linting would go here'"
+    "lint": "echo 'Linting would go here'",
+    "setup:db": "node scripts/setupDatabase.js",
+    "seed:admin": "node scripts/seedAdmin.js"
   },
   "keywords": [
     "restaurant",
@@ -17,19 +19,26 @@
     "api",
     "nodejs",
     "express",
-    "supabase"
+    "supabase",
+    "authentication",
+    "user-management",
+    "jwt",
+    "bcrypt"
   ],
   "author": "Joao Muchunja",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
+    "@supabase/supabase-js": "^2.38.4",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
-    "helmet": "^7.1.0",
-    "morgan": "^1.10.0",
-    "express-rate-limit": "^7.1.5",
-    "joi": "^17.11.0",
+    "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
-    "@supabase/supabase-js": "^2.38.4"
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
