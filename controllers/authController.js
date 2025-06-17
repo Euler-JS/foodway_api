@@ -80,26 +80,39 @@ class AuthController {
   }
 }
 
-  /**
-   * Logout do usuário
-   * POST /api/v1/auth/logout
-   */
+/**
+ * Logout do usuário
+ * POST /api/v1/auth/logout
+ */
 async logout(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
     const cookieToken = req.cookies?.access_token;
     
-    const token = authHeader?.split(' ')[1] || cookieToken;
+    const token = authHeader?.split(' ')[1] || cookieToken || req.currentToken;
     
     if (!token) {
-      throw new ValidationError('Token de acesso não fornecido');
+      // Se não há token, considerar como logout bem-sucedido
+      // (usuário já estava deslogado)
+      if (req.cookies?.access_token) {
+        res.clearCookie('access_token');
+        res.clearCookie('refresh_token');
+        res.clearCookie('user_info');
+      }
+      
+      return ApiResponse.success(res, null, 'Logout realizado com sucesso');
     }
 
-    // Revogar o token específico
-    await this.revokeToken(token);
+    try {
+      // Tentar revogar o token específico
+      await this.revokeToken(token);
+    } catch (error) {
+      // Se falhar ao revogar (token inválido, etc.), continuar com logout
+      console.warn('Erro ao revogar token durante logout:', error.message);
+    }
 
     // Limpar cookies se existirem
-    if (req.cookies?.access_token) {
+    if (req.cookies?.access_token || req.cookies?.refresh_token || req.cookies?.user_info) {
       res.clearCookie('access_token');
       res.clearCookie('refresh_token');
       res.clearCookie('user_info');
@@ -107,7 +120,16 @@ async logout(req, res, next) {
 
     return ApiResponse.success(res, null, 'Logout realizado com sucesso');
   } catch (error) {
-    next(error);
+    // Em caso de erro, ainda assim limpar cookies e considerar logout bem-sucedido
+    console.error('Erro durante logout:', error);
+    
+    if (req.cookies?.access_token || req.cookies?.refresh_token || req.cookies?.user_info) {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+      res.clearCookie('user_info');
+    }
+    
+    return ApiResponse.success(res, null, 'Logout realizado com sucesso');
   }
 }
 
@@ -447,18 +469,49 @@ async logout(req, res, next) {
       }]);
   }
 
-  /**
-   * Revogar token específico
-   * @param {string} token - Token a ser revogado
-   */
-  async revokeToken(token) {
+/**
+ * Revogar token específico - MÉTODO ATUALIZADO
+ * @param {string} token - Token a ser revogado
+ */
+async revokeToken(token) {
+  try {
     const { supabase } = require('../config/supabase');
     
-    await supabase
+    // Verificar se o token existe antes de tentar revogar
+    const tokenHash = this.hashToken(token);
+    
+    const { data: existingToken, error: findError } = await supabase
       .from('auth_tokens')
-      .update({ is_revoked: true })
-      .eq('token_hash', this.hashToken(token));
+      .select('id')
+      .eq('token_hash', tokenHash)
+      .eq('is_revoked', false)
+      .single();
+    
+    if (findError && findError.code !== 'PGRST116') {
+      // PGRST116 = "JSON object requested, multiple (or no) rows returned"
+      throw findError;
+    }
+    
+    if (existingToken) {
+      const { error: updateError } = await supabase
+        .from('auth_tokens')
+        .update({ 
+          is_revoked: true,
+          revoked_at: new Date().toISOString()
+        })
+        .eq('token_hash', tokenHash);
+      
+      if (updateError) {
+        throw updateError;
+      }
+    }
+    // Se o token não existe, não é um erro - pode já ter sido revogado
+    
+  } catch (error) {
+    console.error('Erro ao revogar token:', error);
+    // Não lançar erro - logout deve continuar mesmo se revogar falhar
   }
+}
 
   /**
    * Gerar token de reset de senha

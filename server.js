@@ -39,7 +39,7 @@ app.use(
 // Rate limiting - mais restritivo para autenticação
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // máximo 5 tentativas de login por IP
+  max: 25, // máximo 5 tentativas de login por IP
   message: {
     error: 'Muitas tentativas de login. Tente novamente em 15 minutos.'
   },
@@ -52,7 +52,7 @@ const authLimiter = rateLimit({
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por IP por janela de tempo
+  max: 500, // máximo 100 requests por IP por janela de tempo
   message: {
     error: 'Muitas tentativas. Tente novamente em 15 minutos.'
   }
@@ -109,6 +109,10 @@ app.get('/login', (req, res) => {
 
 app.get('/dashboard', protectRoute, requireSuperAdminRoute, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
+  res.status(204).end();
 });
 
 // Rota raiz

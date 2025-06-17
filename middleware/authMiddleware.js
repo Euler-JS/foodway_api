@@ -11,12 +11,14 @@ const { ValidationError, UnauthorizedError } = require('../utils/errors');
 const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
+    const cookieToken = req.cookies?.access_token;
+    
+    // Aceitar token do header ou cookie
+    const token = authHeader?.split(' ')[1] || cookieToken;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       throw new UnauthorizedError('Token de acesso não fornecido');
     }
-
-    const token = authHeader.split(' ')[1];
 
     try {
       // Verificar token JWT
@@ -37,6 +39,9 @@ const authenticate = async (req, res, next) => {
         role: user.role,
         restaurant_id: user.restaurant_id
       };
+
+      // Adicionar o token atual ao request para uso no logout
+      req.currentToken = token;
 
       next();
     } catch (error) {

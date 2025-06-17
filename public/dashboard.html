@@ -862,6 +862,80 @@
     }
 }
 
+/* ============ Modal Styles for Profile/Password ============ */
+.profile-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.profile-modal-content {
+    background-color: var(--white);
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.logout-confirmation {
+    text-align: center;
+    padding: 20px;
+}
+
+.logout-confirmation h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.logout-confirmation p {
+    margin-bottom: 25px;
+    color: var(--dark-color);
+}
+
+.logout-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-logout-confirm {
+    background: var(--red);
+    color: var(--white);
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-logout-confirm:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+}
+
+.btn-logout-cancel {
+    background: var(--black2);
+    color: var(--white);
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-logout-cancel:hover {
+    background: var(--black1);
+}
+
     </style>
 </head>
 
@@ -933,6 +1007,15 @@
                     </a>
                 </li>
 
+                 <!-- <li class="nav-item" onclick="showProfile()">
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="person-outline"></ion-icon>
+                        </span>
+                        <span class="title">Meu Perfil</span>
+                    </a>
+                </li> -->
+
                 <li>
                     <a href="#" onclick="window.open(apiBaseUrl + '/health', '_blank')">
                         <span class="icon">
@@ -941,7 +1024,18 @@
                         <span class="title">Health Check</span>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="#" onclick="performLogout()">
+                        <span class="icon">
+                            <ion-icon name="exit"></ion-icon>
+                        </span>
+                        <span class="title">Logout</span>
+                    </a>
+                </li>
             </ul>
+
+            
         </div>
 
         <!-- ========================= Main ==================== -->
@@ -1352,6 +1446,79 @@
     </div>
 </div>
 
+<!-- Modal de Confirmação de Logout -->
+<div id="logoutModal" class="modal">
+    <div class="modal-content">
+        <div class="logout-confirmation">
+            <h3>
+                <ion-icon name="log-out-outline" style="margin-right: 10px;"></ion-icon>
+                Confirmar Logout
+            </h3>
+            <p>Tem certeza que deseja sair do sistema?</p>
+            <div class="logout-buttons">
+                <button class="btn-logout-cancel" onclick="closeLogoutModal()">
+                    <ion-icon name="close-outline" style="margin-right: 5px;"></ion-icon>
+                    Cancelar
+                </button>
+                <button class="btn-logout-confirm" onclick="confirmLogout()">
+                    <ion-icon name="log-out-outline" style="margin-right: 5px;"></ion-icon>
+                    Sim, Sair
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Perfil do Usuário -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeProfileModal()">&times;</span>
+        <h2>Meu Perfil</h2>
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="profileName">Nome</label>
+                <input type="text" id="profileName" name="name" readonly>
+            </div>
+            <div class="form-group">
+                <label for="profileEmail">Email</label>
+                <input type="email" id="profileEmail" name="email" readonly>
+            </div>
+            <div class="form-group">
+                <label for="profileRole">Função</label>
+                <input type="text" id="profileRole" name="role" readonly>
+            </div>
+            <div style="text-align: right; margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closeProfileModal()">Fechar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Alteração de Senha -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closePasswordModal()">&times;</span>
+        <h2>Alterar Senha</h2>
+        <form id="passwordForm">
+            <div class="form-group">
+                <label for="currentPassword">Senha Atual *</label>
+                <input type="password" id="currentPassword" name="current_password" required>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">Nova Senha *</label>
+                <input type="password" id="newPassword" name="new_password" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Nova Senha *</label>
+                <input type="password" id="confirmPassword" name="confirm_password" required>
+            </div>
+            <div style="text-align: right; margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closePasswordModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Alterar Senha</button>
+            </div>
+        </form>
+    </div>
+</div>
     <!-- =========== Scripts =========  -->
     <script>
         // Global variables
@@ -1360,6 +1527,406 @@
         let restaurantsData = [];
         let allProductsData = [];
         let allCategoriesForProducts = [];
+        let currentUser = null;
+        let userMenuTimeout = null;
+
+
+
+        // Toggle do menu de usuário
+function toggleUserMenu() {
+    const userMenu = document.querySelector('.user-menu');
+    const isActive = userMenu.classList.contains('active');
+    
+    if (isActive) {
+        closeUserMenu();
+    } else {
+        openUserMenu();
+    }
+}
+
+function openUserMenu() {
+    const userMenu = document.querySelector('.user-menu');
+    userMenu.classList.add('active');
+    
+    // Fechar menu ao clicar fora
+    setTimeout(() => {
+        document.addEventListener('click', closeUserMenuOnOutsideClick);
+    }, 100);
+}
+
+function closeUserMenu() {
+    const userMenu = document.querySelector('.user-menu');
+    userMenu.classList.remove('active');
+    document.removeEventListener('click', closeUserMenuOnOutsideClick);
+}
+
+function closeUserMenuOnOutsideClick(event) {
+    const userMenu = document.querySelector('.user-menu');
+    if (!userMenu.contains(event.target)) {
+        closeUserMenu();
+    }
+}
+
+// Carregar informações do usuário
+async function loadUserInfo() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/auth/me`, {
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                currentUser = data.data;
+                updateUserDisplay();
+            }
+        } else if (response.status === 401) {
+            // Token inválido, redirecionar para login
+            redirectToLogin();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar informações do usuário:', error);
+    }
+}
+
+function updateUserDisplay() {
+    if (currentUser) {
+        // Atualizar nome do usuário na topbar
+        const userNameElements = document.querySelectorAll('#userName, #userNameDropdown');
+        userNameElements.forEach(element => {
+            if (element) element.textContent = currentUser.name;
+        });
+        
+        // Atualizar role do usuário
+        const userRoleElement = document.getElementById('userRole');
+        if (userRoleElement) {
+            const roleText = currentUser.role === 'super_admin' ? 'Super Admin' : 'Usuário do Restaurante';
+            userRoleElement.textContent = roleText;
+        }
+    }
+}
+
+// Função para obter token de autenticação
+function getAuthToken() {
+    const stored = localStorage.getItem('auth_token');
+    if (stored) return stored;
+    
+    // Verificar cookies
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'access_token') {
+            return value;
+        }
+    }
+    
+    return null;
+}
+
+function clearLocalAuth() {
+    // Limpar localStorage
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_info');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    
+    
+    // Limpar cookies (definindo data passada)
+    const expiredDate = new Date(0).toUTCString();
+    document.cookie = `access_token=; expires=${expiredDate}; path=/`;
+    document.cookie = `refresh_token=; expires=${expiredDate}; path=/`;
+    document.cookie = `user_info=; expires=${expiredDate}; path=/`;
+}
+
+// Verificar se usuário está autenticado
+function checkAuthentication() {
+    const token = getAuthToken();
+    if (!token) {
+        redirectToLogin();
+        return false;
+    }
+    return true;
+}
+
+// Redirecionar para login
+function redirectToLogin() {
+    // Limpar dados de autenticação
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
+    
+    // Redirecionar
+    window.location.href = '/login';
+}
+
+// Função principal de logout
+async function performLogout() {
+    // closeUserMenu(); // Fechar menu primeiro
+    openLogoutModal(); // Abrir modal de confirmação
+}
+
+function openLogoutModal() {
+    document.getElementById('logoutModal').style.display = 'block';
+}
+
+function closeLogoutModal() {
+    document.getElementById('logoutModal').style.display = 'none';
+}
+
+async function confirmLogout() {
+    try {
+        // Buscar token do localStorage, cookie ou header
+        const token = getAuthToken();
+        
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Adicionar token ao header se existir
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`${apiBaseUrl}/auth/logout`, {
+            method: 'POST',
+            headers: headers,
+            credentials: 'include' // Incluir cookies na requisição
+        });
+        
+        const data = await response.json();
+        
+        // Limpar dados locais independentemente da resposta
+        clearLocalAuth();
+        
+        if (data.success || response.status === 200) {
+            showSuccess('Logout realizado com sucesso!');
+            
+            // Redirecionar após um breve delay
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        } else {
+            // Mesmo se a API retornar erro, fazer logout local
+            console.warn('Erro na API de logout, mas fazendo logout local:', data.message);
+            showInfo('Sessão finalizada localmente');
+            
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        }
+        
+    } catch (error) {
+        console.error('Erro durante logout:', error);
+        
+        // Em caso de erro de rede, fazer logout local
+        clearLocalAuth();
+        showInfo('Sessão finalizada localmente');
+        
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 1500);
+    
+    } finally {
+        showLoading(false);
+        closeLogoutModal();
+    }
+}
+
+async function clearAllUserData() {
+    // Limpar localStorage
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_info');
+    
+    // Limpar sessionStorage
+    sessionStorage.clear();
+    
+    // Tentar limpar cookies manualmente (JavaScript)
+    // await deleteCookie('access_token');
+    newDeleteCokkies();
+    // await deleteCookie('refresh_token');
+    // await deleteCookie('user_info');
+}
+
+function newDeleteCokkies(){
+    const cookies = document.cookie.split(";");
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i];
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }
+}
+
+async function deleteCookie(name) {
+    // Deletar com diferentes paths e domains para garantir
+    const domains = ['', '.localhost','.vercel.app/', 'https://foodway-api.vercel.app', '.yourdomain.com']; // Adicione seus domínios
+    const paths = ['/', '/api', '/dashboard'];
+    
+    domains.forEach(domain => {
+        paths.forEach(path => {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain};`;
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain}; secure;`;
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; domain=${domain}; httpOnly; secure;`;
+        });
+    });
+}
+
+// Logout em todos os dispositivos
+async function logoutAllDevices() {
+    if (!confirm('Tem certeza que deseja sair de todos os dispositivos? Você precisará fazer login novamente em todos eles.')) {
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        
+        const token = getAuthToken();
+        if (token) {
+            const response = await fetch(`${apiBaseUrl}/auth/logout-all`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                showSuccess('Logout realizado em todos os dispositivos!');
+            }
+        }
+        
+        // Limpar dados locais
+        redirectToLogin();
+        
+    } catch (error) {
+        console.error('Erro durante logout geral:', error);
+        redirectToLogin();
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Funções para modais de perfil e senha
+function showProfile() {
+    // closeUserMenu();
+    if (currentUser) {
+        document.getElementById('profileName').value = currentUser.name || '';
+        document.getElementById('profileEmail').value = currentUser.email || '';
+        document.getElementById('profileRole').value = currentUser.role === 'super_admin' ? 'Super Administrador' : 'Usuário do Restaurante';
+        document.getElementById('profileModal').style.display = 'block';
+    }
+}
+
+function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+}
+
+function showChangePassword() {
+    closeUserMenu();
+    document.getElementById('passwordForm').reset();
+    document.getElementById('passwordModal').style.display = 'block';
+}
+
+function closePasswordModal() {
+    document.getElementById('passwordModal').style.display = 'none';
+    document.getElementById('passwordForm').reset();
+}
+
+// Alterar senha
+async function changeUserPassword(formData) {
+    try {
+        showLoading(true);
+        
+        // Verificar se as senhas coincidem
+        if (formData.new_password !== formData.confirm_password) {
+            showError('As senhas não coincidem');
+            return;
+        }
+        
+        const response = await fetch(`${apiBaseUrl}/auth/change-password`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                current_password: formData.current_password,
+                new_password: formData.new_password
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess('Senha alterada com sucesso! Você será redirecionado para fazer login novamente.');
+            closePasswordModal();
+            
+            // Redirecionar para login após trocar a senha
+            setTimeout(() => {
+                redirectToLogin();
+            }, 2000);
+        } else {
+            throw new Error(data.message || 'Erro ao alterar senha');
+        }
+        
+    } catch (error) {
+        showError('Erro ao alterar senha: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Auto-logout em caso de inatividade (opcional)
+let inactivityTimer = null;
+const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutos
+
+function resetInactivityTimer() {
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+    }
+    
+    inactivityTimer = setTimeout(() => {
+        if (confirm('Sua sessão expirará devido à inatividade. Deseja continuar?')) {
+            resetInactivityTimer();
+        } else {
+            performLogout();
+        }
+    }, INACTIVITY_TIME);
+}
+
+// Monitorar atividade do usuário
+function initInactivityMonitor() {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    events.forEach(event => {
+        document.addEventListener(event, resetInactivityTimer, { passive: true });
+    });
+    
+    resetInactivityTimer();
+}
+
+// Setup de formulário de senha
+function setupPasswordForm() {
+    const form = document.getElementById('passwordForm');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                current_password: document.getElementById('currentPassword').value,
+                new_password: document.getElementById('newPassword').value,
+                confirm_password: document.getElementById('confirmPassword').value
+            };
+            
+            await changeUserPassword(formData);
+        });
+    }
+}
 
 
         // Navigation functionality
@@ -1768,6 +2335,9 @@
             const restaurantModal = document.getElementById('restaurantModal');
             const categoryModal = document.getElementById('categoryModal');
             const productModal = document.getElementById('productModal');
+             const logoutModal = document.getElementById('logoutModal');
+    const profileModal = document.getElementById('profileModal');
+    const passwordModal = document.getElementById('passwordModal');
             
             if (event.target === restaurantModal) {
                 closeModal('restaurant');
@@ -1775,6 +2345,12 @@
                 closeModal('category');
             } else if (event.target === productModal) {
                 closeModal('product');
+            } else if (event.target === logoutModal) {
+                closeLogoutModal();
+            } else if (event.target === profileModal) {
+                closeProfileModal();
+            } else if (event.target === passwordModal) {
+                closePasswordModal();
             }
         }
 
@@ -1784,6 +2360,11 @@
             setupSearch();
             setupForms();
             // setupProductForm();
+
+            initInactivityMonitor();
+            
+            // Configurar formulários
+            setupPasswordForm();
             
             // Load initial data
             await loadStats();
