@@ -936,6 +936,92 @@
     background: var(--black1);
 }
 
+/* Estilos para utilizadores */
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.user-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.user-title h3 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 1.2rem;
+}
+
+.user-email {
+    color: var(--black2);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-info {
+    margin: 15px 0;
+}
+
+.user-info p {
+    margin: 5px 0;
+    color: var(--black2);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-role {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 5px 0;
+}
+
+.user-role.super-admin {
+    background: var(--red);
+    color: white;
+}
+
+.user-role.restaurant-user {
+    background: var(--green);
+    color: white;
+}
+
+.user-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.last-login {
+    font-size: 0.8rem;
+    color: var(--black2);
+    font-style: italic;
+}
+
     </style>
 </head>
 
@@ -986,6 +1072,15 @@
                             <ion-icon name="fast-food-outline"></ion-icon>
                         </span>
                         <span class="title">Produtos</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" data-section="users">
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="people-outline"></ion-icon>
+                        </span>
+                        <span class="title">Utilizadores</span>
                     </a>
                 </li>
 
@@ -1108,6 +1203,16 @@
                         </div>
                         <div class="iconBx">
                             <ion-icon name="pricetag-outline"></ion-icon>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div>
+                            <div class="numbers" id="userCount">0</div>
+                            <div class="cardName">Utilizadores</div>
+                        </div>
+                        <div class="iconBx">
+                            <ion-icon name="people-outline"></ion-icon>
                         </div>
                     </div>
                 </div>
@@ -1280,7 +1385,7 @@
             <!-- Products will be loaded here -->
         </div>
     </div>
-</div>
+            </div>
 
             <div class="content-section" id="menu">
                 <div style="padding: 20px;">
@@ -1306,6 +1411,59 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Adicionar após as outras content-sections -->
+<div class="content-section" id="users">
+    <div style="padding: 20px;">
+        <div class="cardHeader" style="margin-bottom: 30px;">
+            <h2>Gestão de Utilizadores</h2>
+            <button class="btn" onclick="openModal('user')">
+                <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                Novo Utilizador
+            </button>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="filters-bar" style="background: var(--white); padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="filter-group">
+                    <label>Buscar:</label>
+                    <input type="text" id="userSearch" placeholder="Nome ou email..." style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                </div>
+                <div class="filter-group">
+                    <label>Restaurante:</label>
+                    <select id="userRestaurantFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Função:</label>
+                    <select id="userRoleFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todas</option>
+                        <option value="super_admin">Super Admin</option>
+                        <option value="restaurant_user">Utilizador</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="userStatusFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="clearUserFilters()" style="padding: 8px 15px;">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    Limpar
+                </button>
+            </div>
+        </div>
+        
+        <div class="user-grid" id="userGrid">
+            <!-- Users will be loaded here -->
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
@@ -1446,6 +1604,69 @@
     </div>
 </div>
 
+<!-- Modal de Utilizador -->
+<div id="userModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <span class="close" onclick="closeModal('user')">&times;</span>
+        <h2 id="userModalTitle">Novo Utilizador</h2>
+        <form id="userForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="userName">Nome *</label>
+                    <input type="text" id="userName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email *</label>
+                    <input type="email" id="userEmail" name="email" required>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="userRole">Função *</label>
+                    <select id="userRole" name="role" required>
+                        <option value="">Selecione uma função</option>
+                        <option value="super_admin">Super Administrador</option>
+                        <option value="restaurant_user">Utilizador do Restaurante</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="userRestaurant">Restaurante</label>
+                    <select id="userRestaurant" name="restaurant_id">
+                        <option value="">Selecione um restaurante</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="userPassword">Senha *</label>
+                <input type="password" id="userPassword" name="password" required minlength="6">
+                <small>Mínimo 6 caracteres</small>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="userActive" name="is_active" checked>
+                        Utilizador Ativo
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="userEmailVerified" name="email_verified">
+                        Email Verificado
+                    </label>
+                </div>
+            </div>
+            
+            <div style="text-align: right; margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closeModal('user')">Cancelar</button>
+                <button type="submit" class="btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Modal de Confirmação de Logout -->
 <div id="logoutModal" class="modal">
     <div class="modal-content">
@@ -1529,6 +1750,8 @@
         let allCategoriesForProducts = [];
         let currentUser = null;
         let userMenuTimeout = null;
+        let allUsersData = [];
+        let currentUserEditId = null;
 
 
 
@@ -1610,10 +1833,10 @@ function updateUserDisplay() {
 
 // Função para obter token de autenticação
 function getAuthToken() {
-    const stored = localStorage.getItem('auth_token');
+    const stored = localStorage.getItem('access_token');
     if (stored) return stored;
     
-    // Verificar cookies
+    // Tentar pegar dos cookies
     const cookies = document.cookie.split(';');
     for (let cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
@@ -1622,6 +1845,18 @@ function getAuthToken() {
         }
     }
     
+    // Verificar se há informações do usuário nos cookies
+    const userInfo = getCookie('user_info');
+    if (userInfo) {
+        try {
+            const user = JSON.parse(decodeURIComponent(userInfo));
+            console.log('User from cookie:', user);
+        } catch (e) {
+            console.error('Error parsing user info:', e);
+        }
+    }
+    
+    console.warn('No auth token found');
     return null;
 }
 
@@ -1928,6 +2163,383 @@ function setupPasswordForm() {
     }
 }
 
+// Carregar utilizadores
+async function loadUsers() {
+    try {
+        showLoading(true);
+        const response = await fetch(`${apiBaseUrl}/users`, {
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.data) {
+            allUsersData = data.data.data;
+            populateUserFilters();
+            applyUserFilters();
+        } else {
+            allUsersData = [];
+            displayUsers([]);
+        }
+    } catch (error) {
+        showError('Erro ao carregar utilizadores: ' + error.message);
+        allUsersData = [];
+        displayUsers([]);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Exibir utilizadores
+function displayUsers(users) {
+    const grid = document.getElementById('userGrid');
+    
+    if (!users || users.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                <ion-icon name="people-outline" style="font-size: 4rem; color: var(--black2); margin-bottom: 20px;"></ion-icon>
+                <h3 style="color: var(--black2); margin-bottom: 10px;">Nenhum utilizador encontrado</h3>
+                <p style="color: var(--black2); margin-bottom: 30px;">Tente ajustar os filtros ou criar um novo utilizador</p>
+                <button class="btn-primary" onclick="openModal('user')">
+                    <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                    Criar Utilizador
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = users.map(user => `
+        <div class="user-card">
+            <div class="user-header">
+                <div class="user-title">
+                    <h3>${user.name}</h3>
+                    <div class="user-email">
+                        <ion-icon name="mail-outline"></ion-icon>
+                        ${user.email}
+                    </div>
+                </div>
+                <span class="status ${user.is_active ? 'active' : 'inactive'}">
+                    ${user.is_active ? 'Ativo' : 'Inativo'}
+                </span>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-role ${user.role.replace('_', '-')}">
+                    ${user.role === 'super_admin' ? 'Super Admin' : 'Utilizador'}
+                </div>
+                
+                ${user.restaurant_name ? `
+                    <p><ion-icon name="storefront-outline"></ion-icon> ${user.restaurant_name}</p>
+                ` : '<p><ion-icon name="business-outline"></ion-icon> Administrador Geral</p>'}
+                
+                <p><ion-icon name="calendar-outline"></ion-icon> Criado em ${formatDate(user.created_at)}</p>
+                
+                ${user.last_login ? `
+                    <p class="last-login">Último acesso: ${formatDate(user.last_login)}</p>
+                ` : '<p class="last-login">Nunca fez login</p>'}
+            </div>
+            
+            <div class="user-actions">
+                <button class="btn-sm btn-edit" onclick="editUser(${user.id})" title="Editar">
+                    <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button class="btn-sm ${user.is_active ? 'btn-warning' : 'btn-success'}" 
+                        onclick="toggleUserStatus(${user.id}, ${user.is_active})" 
+                        title="${user.is_active ? 'Inativar' : 'Ativar'}">
+                    <ion-icon name="${user.is_active ? 'pause-outline' : 'play-outline'}"></ion-icon>
+                </button>
+                <button class="btn-sm btn-delete" onclick="deleteUser(${user.id})" title="Deletar">
+                    <ion-icon name="trash-outline"></ion-icon>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Popular filtros de utilizadores
+function populateUserFilters() {
+    const restaurantFilter = document.getElementById('userRestaurantFilter');
+    restaurantFilter.innerHTML = '<option value="">Todos</option>';
+    
+    // Adicionar opção para administradores
+    restaurantFilter.innerHTML += '<option value="null">Administradores</option>';
+    
+    // Adicionar restaurantes
+    const uniqueRestaurants = [...new Set(allUsersData
+        .filter(user => user.restaurant_name)
+        .map(user => JSON.stringify({id: user.restaurant_id, name: user.restaurant_name}))
+    )].map(str => JSON.parse(str));
+    
+    uniqueRestaurants.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantFilter.appendChild(option);
+    });
+}
+
+// Aplicar filtros de utilizadores
+function applyUserFilters() {
+    const searchTerm = document.getElementById('userSearch')?.value.toLowerCase() || '';
+    const restaurantFilter = document.getElementById('userRestaurantFilter')?.value || '';
+    const roleFilter = document.getElementById('userRoleFilter')?.value || '';
+    const statusFilter = document.getElementById('userStatusFilter')?.value || '';
+    
+    let filteredUsers = [...allUsersData];
+    
+    // Aplicar filtro de busca
+    if (searchTerm) {
+        filteredUsers = filteredUsers.filter(user =>
+            user.name.toLowerCase().includes(searchTerm) ||
+            user.email.toLowerCase().includes(searchTerm) ||
+            (user.restaurant_name && user.restaurant_name.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    // Aplicar filtro de restaurante
+    if (restaurantFilter) {
+        if (restaurantFilter === 'null') {
+            filteredUsers = filteredUsers.filter(user => !user.restaurant_id);
+        } else {
+            filteredUsers = filteredUsers.filter(user => 
+                user.restaurant_id && user.restaurant_id.toString() === restaurantFilter
+            );
+        }
+    }
+    
+    // Aplicar filtro de função
+    if (roleFilter) {
+        filteredUsers = filteredUsers.filter(user => user.role === roleFilter);
+    }
+    
+    // Aplicar filtro de status
+    if (statusFilter !== '') {
+        const isActive = statusFilter === 'true';
+        filteredUsers = filteredUsers.filter(user => user.is_active === isActive);
+    }
+    
+    displayUsers(filteredUsers);
+}
+
+// Abrir modal de utilizador
+function openUserModal(data = null) {
+    const modal = document.getElementById('userModal');
+    const title = document.getElementById('userModalTitle');
+    const form = document.getElementById('userForm');
+    
+    currentUserEditId = data ? data.id : null;
+    title.textContent = data ? 'Editar Utilizador' : 'Novo Utilizador';
+    
+    // Popular select de restaurantes
+    const restaurantSelect = document.getElementById('userRestaurant');
+    restaurantSelect.innerHTML = '<option value="">Selecione um restaurante</option>';
+    restaurantsData.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantSelect.appendChild(option);
+    });
+    
+    if (data) {
+        document.getElementById('userName').value = data.name || '';
+        document.getElementById('userEmail').value = data.email || '';
+        document.getElementById('userRole').value = data.role || '';
+        document.getElementById('userRestaurant').value = data.restaurant_id || '';
+        document.getElementById('userPassword').required = false;
+        document.getElementById('userActive').checked = data.is_active !== false;
+        document.getElementById('userEmailVerified').checked = data.email_verified === true;
+        
+        // Esconder campo de senha para edição
+        document.querySelector('label[for="userPassword"]').style.display = 'none';
+        document.getElementById('userPassword').style.display = 'none';
+    } else {
+        form.reset();
+        document.getElementById('userActive').checked = true;
+        document.getElementById('userPassword').required = true;
+        
+        // Mostrar campo de senha para criação
+        document.querySelector('label[for="userPassword"]').style.display = 'block';
+        document.getElementById('userPassword').style.display = 'block';
+    }
+    
+    modal.style.display = 'block';
+}
+
+// Configurar formulário de utilizadores
+function setupUserForm() {
+    const form = document.getElementById('userForm');
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            name: document.getElementById('userName').value.trim(),
+            email: document.getElementById('userEmail').value.trim(),
+            role: document.getElementById('userRole').value,
+            restaurant_id: document.getElementById('userRestaurant').value || null,
+            is_active: document.getElementById('userActive').checked,
+            email_verified: document.getElementById('userEmailVerified').checked
+        };
+        
+        // Adicionar senha apenas se estiver criando
+        if (!currentUserEditId) {
+            formData.password = document.getElementById('userPassword').value;
+        }
+        
+        await saveUser(formData);
+    });
+    
+    // Controlar exibição do restaurante baseado na função
+    const roleSelect = document.getElementById('userRole');
+    const restaurantSelect = document.getElementById('userRestaurant');
+    
+    roleSelect.addEventListener('change', () => {
+        const isRestaurantUser = roleSelect.value === 'restaurant_user';
+        restaurantSelect.disabled = !isRestaurantUser;
+        restaurantSelect.required = isRestaurantUser;
+        
+        if (!isRestaurantUser) {
+            restaurantSelect.value = '';
+        }
+    });
+}
+
+// Salvar utilizador
+async function saveUser(formData) {
+    try {
+        showLoading(true);
+        // if (!token) {
+        //     showError('Você precisa estar logado para realizar esta ação.');
+        //     return;
+        // }
+        const method = currentUserEditId ? 'PUT' : 'POST';
+        const url = currentUserEditId 
+            ? `${apiBaseUrl}/users/${currentUserEditId}` 
+            : `${apiBaseUrl}/users`;
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${getAuthToken()}`
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(currentUserEditId ? 'Utilizador atualizado com sucesso!' : 'Utilizador criado com sucesso!');
+            closeModal('user');
+            await loadUsers();
+            await loadStats(); // Atualizar estatísticas
+        } else {
+            throw new Error(data.message || 'Erro ao salvar utilizador');
+        }
+    } catch (error) {
+        showError('Erro ao salvar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Editar utilizador
+async function editUser(id) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/users/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            openUserModal(data.data);
+        } else {
+            throw new Error('Utilizador não encontrado');
+        }
+    } catch (error) {
+        showError('Erro ao carregar utilizador: ' + error.message);
+    }
+}
+
+// Alternar status do utilizador
+async function toggleUserStatus(id, currentStatus) {
+    try {
+        showLoading(true);
+        
+        const endpoint = currentStatus 
+            ? `${apiBaseUrl}/users/${id}` // DELETE para inativar
+            : `${apiBaseUrl}/users/${id}/reactivate`; // PATCH para reativar
+        
+        const method = currentStatus ? 'DELETE' : 'PATCH';
+        
+        const response = await fetch(endpoint, { 
+            method,
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`Utilizador ${currentStatus ? 'inativado' : 'reativado'} com sucesso!`);
+            await loadUsers();
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showError('Erro: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Deletar utilizador
+async function deleteUser(id) {
+    const user = allUsersData.find(u => u.id === id);
+    if (!user) return;
+    
+    const confirmMsg = `Tem certeza que deseja inativar o utilizador "${user.name}"?\n\nEsta ação pode ser revertida posteriormente.`;
+    
+    if (!confirm(confirmMsg)) return;
+    
+    await toggleUserStatus(id, true);
+}
+
+// Limpar filtros de utilizadores
+function clearUserFilters() {
+    document.getElementById('userSearch').value = '';
+    document.getElementById('userRestaurantFilter').value = '';
+    document.getElementById('userRoleFilter').value = '';
+    document.getElementById('userStatusFilter').value = '';
+    applyUserFilters();
+}
+
+// Configurar filtros de utilizadores
+function setupUserFilters() {
+    const searchInput = document.getElementById('userSearch');
+    const restaurantFilter = document.getElementById('userRestaurantFilter');
+    const roleFilter = document.getElementById('userRoleFilter');
+    const statusFilter = document.getElementById('userStatusFilter');
+    
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyUserFilters, 300);
+        });
+    }
+    
+    [restaurantFilter, roleFilter, statusFilter].forEach(filter => {
+        if (filter) {
+            filter.addEventListener('change', applyUserFilters);
+        }
+    });
+}
+
 
         // Navigation functionality
         function initNavigation() {
@@ -1982,6 +2594,8 @@ function setupPasswordForm() {
         async function loadStats() {
             try {
                 showLoading(true);
+                const token = getAuthToken();
+               
                 const response = await fetch(`${apiBaseUrl}/restaurants/stats`);
                 const data = await response.json();
                 
@@ -1995,6 +2609,14 @@ function setupPasswordForm() {
                 // Carregar produtos em promoção
                 const responsePromotions = await fetch(`${apiBaseUrl}/products/promotions`);
                 const dataPromotions = await responsePromotions.json();
+
+                const responseUsers = await fetch(`${apiBaseUrl}/users/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const dataUsers = await responseUsers.json();
 
                 if (data.success) {
                     document.getElementById('restaurantCount').textContent = data.data?.active || 0;
@@ -2012,6 +2634,10 @@ function setupPasswordForm() {
                     
                 if (dataPromotions.success) {
                         document.getElementById('promotionCount').textContent = dataPromotions.data?.pagination?.total || 0;
+                }
+
+                if (dataUsers.success) {
+                    document.getElementById('userCount').textContent = dataUsers.data?.active_users || 0;
                 }
             } catch (error) {
                 showError('Erro ao carregar estatísticas: ' + error.message);
@@ -2172,7 +2798,10 @@ function setupPasswordForm() {
         } else if (type === 'product') {
             openProductModal(data);
             return;
-        } 
+        } else if (type === 'user') {
+            openUserModal(data);
+            return;
+        }
          else {
             form.reset();
         }
@@ -2188,6 +2817,8 @@ function setupPasswordForm() {
                 }
                 else if (type === 'product') {
         document.getElementById('productModal').style.display = 'none';
+    } else  if (type === 'user') {
+        document.getElementById('userModal').style.display = 'none';
     }
     currentEditId = null;
         }
@@ -2371,6 +3002,13 @@ function setupPasswordForm() {
             await loadRestaurants();
             await loadCategories();
             await loadCategoriesForProducts();
+
+            // Carregar utilizadores
+            if (document.getElementById('userGrid')) {
+                await loadUsers();
+                setupUserFilters();
+                setupUserForm();
+            }
 
             setTimeout(setupCategoryFilters, 500);
             
