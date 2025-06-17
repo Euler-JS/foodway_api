@@ -5,6 +5,13 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 class AuthController {
+        constructor() {
+    // Fazer bind de todos os métodos
+    this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
+    this.me = this.me.bind(this);
+    this.generateTokens = this.generateTokens.bind(this);
+  }
   /**
    * Login do usuário
    * POST /api/v1/auth/login
