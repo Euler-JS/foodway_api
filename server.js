@@ -10,6 +10,10 @@ const path = require('path');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { authenticate, optionalAuthenticate, setSupabaseContext } = require('./middleware/authMiddleware');
 
+const cookieParser = require('cookie-parser'); // npm install cookie-parser
+const { protectRoute, requireSuperAdminRoute } = require('./middleware/routeProtection');
+
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -73,6 +77,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(optionalAuthenticate);
 app.use(setSupabaseContext);
 
+app.use(cookieParser());
+
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -101,7 +107,7 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', protectRoute, requireSuperAdminRoute, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 

@@ -17,58 +17,99 @@ class AuthController {
    * POST /api/v1/auth/login
    */
   async login(req, res, next) {
-    try {
-      const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-      if (!email || !password) {
-        throw new ValidationError('Email e senha são obrigatórios');
-      }
-      
-      // Autenticar usuário
-      const user = await User.authenticate(email, password);
-
-      // Gerar tokens
-      const { accessToken, refreshToken } = await this.generateTokens(user);
-
-      // Salvar refresh token no banco
-      await this.saveRefreshToken(user.id, refreshToken, req);
-
-      return ApiResponse.success(res, {
-        user,
-        tokens: {
-          access_token: accessToken,
-          refresh_token: refreshToken,
-          token_type: 'Bearer',
-          expires_in: 24 * 60 * 60 // 24 horas em segundos
-        }
-      }, 'Login realizado com sucesso');
-    } catch (error) {
-      next(error);
+    if (!email || !password) {
+      throw new ValidationError('Email e senha são obrigatórios');
     }
+    
+    // Autenticar usuário
+    const user = await User.authenticate(email, password);
+
+    // Gerar tokens
+    const { accessToken, refreshToken } = await this.generateTokens(user);
+
+    // Salvar refresh token no banco
+    await this.saveRefreshToken(user.id, refreshToken, req);
+
+    // Configurar cookies para navegador (apenas para rotas web)
+    const isWebRequest = req.headers.accept?.includes('text/html') || 
+                        req.headers['user-agent']?.includes('Mozilla');
+    
+    if (isWebRequest) {
+      // Definir cookies seguros
+      res.cookie('access_token', accessToken, {
+        httpOnly: true, // Protege contra XSS
+        secure: process.env.NODE_ENV === 'production', // HTTPS apenas em produção
+        sameSite: 'strict', // Protege contra CSRF
+        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+      });
+
+      res.cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
+      });
+
+      res.cookie('user_info', JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }), {
+        httpOnly: false, // Permite acesso via JavaScript
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000
+      });
+    }
+
+    return ApiResponse.success(res, {
+      user,
+      tokens: {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        token_type: 'Bearer',
+        expires_in: 24 * 60 * 60 // 24 horas em segundos
+      }
+    }, 'Login realizado com sucesso');
+  } catch (error) {
+    next(error);
   }
+}
 
   /**
    * Logout do usuário
    * POST /api/v1/auth/logout
    */
-  async logout(req, res, next) {
-    try {
-      const authHeader = req.headers.authorization;
-      
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new ValidationError('Token de acesso não fornecido');
-      }
-
-      const token = authHeader.split(' ')[1];
-      
-      // Revogar o token específico
-      await this.revokeToken(token);
-
-      return ApiResponse.success(res, null, 'Logout realizado com sucesso');
-    } catch (error) {
-      next(error);
+async logout(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    const cookieToken = req.cookies?.access_token;
+    
+    const token = authHeader?.split(' ')[1] || cookieToken;
+    
+    if (!token) {
+      throw new ValidationError('Token de acesso não fornecido');
     }
+
+    // Revogar o token específico
+    await this.revokeToken(token);
+
+    // Limpar cookies se existirem
+    if (req.cookies?.access_token) {
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+      res.clearCookie('user_info');
+    }
+
+    return ApiResponse.success(res, null, 'Logout realizado com sucesso');
+  } catch (error) {
+    next(error);
   }
+}
 
   /**
    * Logout de todos os dispositivos
