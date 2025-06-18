@@ -1099,6 +1099,194 @@
 .numbers {
     transition: opacity 0.3s ease;
 }
+
+<!-- 5. ESTILOS CSS ADICIONAIS (adicionar no <style>) -->
+<style>
+/* Estilos para a seção de mesas */
+.table-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.table-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.table-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.table-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.table-status {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-end;
+}
+
+.table-info {
+    margin: 15px 0;
+}
+
+.table-info p {
+    margin: 8px 0;
+    color: var(--black2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.table-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.table-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.qr-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.qr-indicator.has-qr {
+    background: var(--success);
+    color: white;
+}
+
+.qr-indicator.no-qr {
+    background: var(--black2);
+    color: white;
+}
+
+/* Estilos para QR Manager */
+.qr-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.qr-tab {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    background: var(--gray);
+    color: var(--dark-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+
+.qr-tab.active {
+    background: var(--primary-color);
+    color: var(--white);
+    border-bottom-color: var(--secondary-color);
+}
+
+.qr-tab:hover:not(.active) {
+    background: var(--light-color);
+}
+
+.qr-tab-content {
+    display: none;
+}
+
+.qr-tab-content.active {
+    display: block;
+}
+
+.qr-preview-container {
+    background: var(--gray);
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.qr-preview-container img {
+    max-width: 100%;
+    border: 2px solid var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.table-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.table-checkbox-item:last-child {
+    border-bottom: none;
+}
+
+.table-checkbox-item label {
+    margin-left: 10px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.qr-batch-result {
+    background: var(--gray);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.qr-batch-success {
+    border-left: 4px solid var(--success);
+}
+
+.qr-batch-error {
+    border-left: 4px solid var(--error);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-actions {
+        justify-content: center;
+    }
+    
+    .qr-tabs {
+        flex-direction: column;
+    }
+}
     </style>
 </head>
 
@@ -1155,6 +1343,15 @@
                             <ion-icon name="fast-food-outline"></ion-icon>
                         </span>
                         <span class="title">Produtos</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" data-section="tables">
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="grid-outline"></ion-icon>
+                        </span>
+                        <span class="title">Mesas</span>
                     </a>
                 </li>
 
@@ -1286,6 +1483,16 @@
                         </div>
                         <div class="iconBx">
                             <ion-icon name="pricetag-outline"></ion-icon>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div>
+                            <div class="numbers" id="tableCount">0</div>
+                            <div class="cardName">Mesas</div>
+                        </div>
+                        <div class="iconBx">
+                            <ion-icon name="grid-outline"></ion-icon>
                         </div>
                     </div>
 
@@ -1469,6 +1676,69 @@
         </div>
     </div>
             </div>
+
+            <div class="content-section" id="tables">
+    <div style="padding: 20px;">
+        <div class="cardHeader" style="margin-bottom: 30px;">
+            <h2>Gestão de Mesas</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="openModal('table')">
+                    <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                    Nova Mesa
+                </button>
+                <button class="btn-secondary" onclick="openBatchTableModal()">
+                    <ion-icon name="copy-outline" style="margin-right: 8px;"></ion-icon>
+                    Criar em Lote
+                </button>
+                <button class="btn-secondary" onclick="openQRManagerModal()">
+                    <ion-icon name="qr-code-outline" style="margin-right: 8px;"></ion-icon>
+                    QR Codes
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="filters-bar" style="background: var(--white); padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="filter-group">
+                    <label>Buscar:</label>
+                    <input type="text" id="tableSearch" placeholder="Número ou nome..." style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                </div>
+                <div class="filter-group">
+                    <label>Restaurante:</label>
+                    <select id="tableRestaurantFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="tableStatusFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>QR Code:</label>
+                    <select id="tableQRFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                        <option value="true">Com QR</option>
+                        <option value="false">Sem QR</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="clearTableFilters()" style="padding: 8px 15px;">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    Limpar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Grid de Mesas -->
+        <div class="table-grid" id="tableGrid">
+            <!-- Tables will be loaded here -->
+        </div>
+    </div>
+</div>
 
             <div class="content-section" id="menu">
                 <div style="padding: 20px;">
@@ -1687,6 +1957,212 @@
     </div>
 </div>
 
+<!-- 4. MODAIS PARA MESAS -->
+
+<!-- Modal de Mesa Individual -->
+<div id="tableModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('table')">&times;</span>
+        <h2 id="tableModalTitle">Nova Mesa</h2>
+        <form id="tableForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="tableRestaurant">Restaurante *</label>
+                    <select id="tableRestaurant" name="restaurant_id" required>
+                        <option value="">Selecione um restaurante</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tableNumber">Número da Mesa *</label>
+                    <input type="number" id="tableNumber" name="table_number" required min="1">
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="tableName">Nome/Descrição</label>
+                    <input type="text" id="tableName" name="name" placeholder="Ex: Mesa da Janela">
+                </div>
+                <div class="form-group">
+                    <label for="tableCapacity">Capacidade</label>
+                    <input type="number" id="tableCapacity" name="capacity" min="1" max="20" value="4">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="tableActive" name="is_active" checked>
+                    Mesa Ativa
+                </label>
+            </div>
+            
+            <div style="text-align: right; margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closeModal('table')">Cancelar</button>
+                <button type="submit" class="btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Criação em Lote -->
+<div id="batchTableModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeBatchTableModal()">&times;</span>
+        <h2>Criar Mesas em Lote</h2>
+        <form id="batchTableForm">
+            <div class="form-group">
+                <label for="batchRestaurant">Restaurante *</label>
+                <select id="batchRestaurant" name="restaurant_id" required>
+                    <option value="">Selecione um restaurante</option>
+                </select>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label for="startNumber">Número Inicial *</label>
+                    <input type="number" id="startNumber" name="start_number" required min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="endNumber">Número Final *</label>
+                    <input type="number" id="endNumber" name="end_number" required min="1" value="10">
+                </div>
+                <div class="form-group">
+                    <label for="batchCapacity">Capacidade Padrão</label>
+                    <input type="number" id="batchCapacity" name="capacity" min="1" max="20" value="4">
+                </div>
+            </div>
+            
+            <div style="background: var(--light-color); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p><strong>Exemplo:</strong> Do número 1 ao 10 criará as mesas: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10</p>
+                <p><strong>Máximo:</strong> 100 mesas por vez</p>
+            </div>
+            
+            <div style="text-align: right; margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closeBatchTableModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Criar Mesas</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Gerenciamento de QR Codes -->
+<div id="qrManagerModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <span class="close" onclick="closeQRManagerModal()">&times;</span>
+        <h2>Gerenciamento de QR Codes</h2>
+        
+        <div style="margin-bottom: 30px;">
+            <div class="form-group">
+                <label for="qrRestaurant">Restaurante *</label>
+                <select id="qrRestaurant" name="restaurant_id" required onchange="loadRestaurantTables()">
+                    <option value="">Selecione um restaurante</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="qr-tabs" style="display: flex; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px;">
+            <button class="qr-tab active" data-tab="individual" onclick="switchQRTab('individual')">QR Individual</button>
+            <button class="qr-tab" data-tab="batch" onclick="switchQRTab('batch')">QR em Lote</button>
+            <button class="qr-tab" data-tab="print" onclick="switchQRTab('print')">Imprimir</button>
+        </div>
+        
+        <!-- Tab Individual -->
+        <div id="qrTabIndividual" class="qr-tab-content active">
+            <div class="form-group">
+                <label for="qrTableSelect">Mesa:</label>
+                <select id="qrTableSelect" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                    <option value="">Selecione uma mesa</option>
+                </select>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                <div class="form-group">
+                    <label>Formato:</label>
+                    <select id="qrFormat" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        <option value="png">PNG</option>
+                        <option value="svg">SVG</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tamanho:</label>
+                    <select id="qrSize" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        <option value="150">150px</option>
+                        <option value="200" selected>200px</option>
+                        <option value="300">300px</option>
+                        <option value="400">400px</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn-primary" onclick="generateSingleQR()">
+                    <ion-icon name="qr-code-outline" style="margin-right: 8px;"></ion-icon>
+                    Gerar QR Code
+                </button>
+            </div>
+            
+            <div id="qrPreview" style="text-align: center; margin-top: 20px; display: none;">
+                <!-- QR preview will appear here -->
+            </div>
+        </div>
+        
+        <!-- Tab Lote -->
+        <div id="qrTabBatch" class="qr-tab-content">
+            <div class="form-group">
+                <label>Mesas Selecionadas:</label>
+                <div id="tableCheckboxList" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
+                    <!-- Checkboxes de mesas serão carregadas aqui -->
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <button class="btn-secondary" onclick="selectAllTables()">Selecionar Todas</button>
+                <button class="btn-secondary" onclick="deselectAllTables()">Deselecionar Todas</button>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn-primary" onclick="generateBatchQR()">
+                    <ion-icon name="qr-code-outline" style="margin-right: 8px;"></ion-icon>
+                    Gerar QR Codes
+                </button>
+            </div>
+            
+            <div id="batchQRResults" style="margin-top: 20px;">
+                <!-- Resultados do lote aparecerão aqui -->
+            </div>
+        </div>
+        
+        <!-- Tab Imprimir -->
+        <div id="qrTabPrint" class="qr-tab-content">
+            <div class="form-group">
+                <label>Mesas para Impressão:</label>
+                <div style="margin: 10px 0;">
+                    <label>
+                        <input type="radio" name="printSelection" value="all" checked>
+                        Todas as mesas ativas
+                    </label>
+                </div>
+                <div style="margin: 10px 0;">
+                    <label>
+                        <input type="radio" name="printSelection" value="selected">
+                        Apenas mesas selecionadas:
+                    </label>
+                    <input type="text" id="printTableNumbers" placeholder="Ex: 1,2,3,5,8" style="margin-left: 10px; padding: 8px; width: 200px;">
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-primary" onclick="openPrintPage()">
+                    <ion-icon name="print-outline" style="margin-right: 8px;"></ion-icon>
+                    Abrir Página de Impressão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de Utilizador -->
 <div id="userModal" class="modal">
     <div class="modal-content" style="max-width: 600px;">
@@ -1835,6 +2311,8 @@
         let userMenuTimeout = null;
         let allUsersData = [];
         let currentUserEditId = null;
+        let allTablesData = [];
+        let currentTableEditId = null;
 
         // Cache simples para evitar requests desnecessários
 const statsCache = {
@@ -2038,6 +2516,8 @@ function controlRoleBasedAccess() {
     }
 }
 
+
+
 // Função para carregar e exibir informações do restaurante do usuário
 async function loadUserRestaurantInfo() {
     try {
@@ -2067,6 +2547,200 @@ async function loadUserRestaurantInfo() {
     }
 }
 
+
+// Carregar mesas
+async function loadTables() {
+    try {
+        showLoading(true);
+        let url = `${apiBaseUrl}/tables?limit=100`;
+        
+        // Filtrar por restaurante se for restaurant_user
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url = `${apiBaseUrl}/restaurants/${currentUser.restaurant_id}/tables`;
+        }
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            allTablesData = Array.isArray(data.data) ? data.data : data.data.data || [];
+            populateTableFilters();
+            applyTableFilters();
+        } else {
+            allTablesData = [];
+            displayTables([]);
+        }
+    } catch (error) {
+        showError('Erro ao carregar mesas: ' + error.message);
+        allTablesData = [];
+        displayTables([]);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Exibir mesas
+function displayTables(tables) {
+    const grid = document.getElementById('tableGrid');
+    
+    if (!tables || tables.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                <ion-icon name="grid-outline" style="font-size: 4rem; color: var(--black2); margin-bottom: 20px;"></ion-icon>
+                <h3 style="color: var(--black2); margin-bottom: 10px;">Nenhuma mesa encontrada</h3>
+                <p style="color: var(--black2); margin-bottom: 30px;">Comece criando suas primeiras mesas</p>
+                <button class="btn-primary" onclick="openModal('table')">
+                    <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+                    Criar Mesa
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = tables.map(table => {
+        const restaurant = table.restaurant || {};
+        const hasQR = table.qr_code_generated;
+        
+        return `
+            <div class="table-card">
+                <div class="table-header">
+                    <div>
+                        <div class="table-number">Mesa ${table.table_number}</div>
+                        ${table.name ? `<div class="table-name">${table.name}</div>` : ''}
+                    </div>
+                    <div class="table-status">
+                        <span class="status ${table.is_active ? 'active' : 'inactive'}">
+                            ${table.is_active ? 'Ativa' : 'Inativa'}
+                        </span>
+                        <span class="qr-indicator ${hasQR ? 'has-qr' : 'no-qr'}">
+                            <ion-icon name="qr-code${hasQR ? '' : '-outline'}"></ion-icon>
+                            ${hasQR ? 'Com QR' : 'Sem QR'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="table-info">
+                    <p><ion-icon name="storefront-outline"></ion-icon> ${restaurant.name || 'Restaurante não encontrado'}</p>
+                    <p><ion-icon name="people-outline"></ion-icon> Capacidade: ${table.capacity || 4} pessoas</p>
+                    <p><ion-icon name="calendar-outline"></ion-icon> Criada em ${formatDate(table.created_at)}</p>
+                    ${table.last_qr_generated_at ? `<p><ion-icon name="time-outline"></ion-icon> QR gerado em ${formatDate(table.last_qr_generated_at)}</p>` : ''}
+                </div>
+                
+                <div class="table-actions">
+                    <button class="btn-sm btn-edit" onclick="editTable(${table.id})" title="Editar">
+                        <ion-icon name="create-outline"></ion-icon>
+                    </button>
+                    <button class="btn-sm btn-success" onclick="generateTableQR(${table.id})" title="Gerar QR">
+                        <ion-icon name="qr-code-outline"></ion-icon>
+                    </button>
+                    <button class="btn-sm btn-view" onclick="previewTableMenu(${table.restaurant_id}, ${table.table_number})" title="Ver Menu">
+                        <ion-icon name="restaurant-outline"></ion-icon>
+                    </button>
+                    <button class="btn-sm ${table.is_active ? 'btn-warning' : 'btn-success'}" 
+                            onclick="toggleTableStatus(${table.id}, ${table.is_active})" 
+                            title="${table.is_active ? 'Inativar' : 'Ativar'}">
+                        <ion-icon name="${table.is_active ? 'pause-outline' : 'play-outline'}"></ion-icon>
+                    </button>
+                    <button class="btn-sm btn-delete" onclick="deleteTable(${table.id})" title="Deletar">
+                        <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Popular filtros de mesas
+function populateTableFilters() {
+    const restaurantFilter = document.getElementById('tableRestaurantFilter');
+    restaurantFilter.innerHTML = '<option value="">Todos</option>';
+    
+    const uniqueRestaurants = [...new Set(allTablesData
+        .filter(table => table.restaurant)
+        .map(table => JSON.stringify({id: table.restaurant.id, name: table.restaurant.name}))
+    )].map(str => JSON.parse(str));
+    
+    uniqueRestaurants.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantFilter.appendChild(option);
+    });
+}
+
+// Aplicar filtros de mesas
+function applyTableFilters() {
+    const searchTerm = document.getElementById('tableSearch')?.value.toLowerCase() || '';
+    const restaurantFilter = document.getElementById('tableRestaurantFilter')?.value || '';
+    const statusFilter = document.getElementById('tableStatusFilter')?.value || '';
+    const qrFilter = document.getElementById('tableQRFilter')?.value || '';
+    
+    let filteredTables = [...allTablesData];
+    
+    // Filtro de busca
+    if (searchTerm) {
+        filteredTables = filteredTables.filter(table =>
+            table.table_number.toString().includes(searchTerm) ||
+            (table.name && table.name.toLowerCase().includes(searchTerm)) ||
+            (table.restaurant && table.restaurant.name.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    // Filtro de restaurante
+    if (restaurantFilter) {
+        filteredTables = filteredTables.filter(table =>
+            table.restaurant_id.toString() === restaurantFilter
+        );
+    }
+    
+    // Filtro de status
+    if (statusFilter !== '') {
+        const isActive = statusFilter === 'true';
+        filteredTables = filteredTables.filter(table => table.is_active === isActive);
+    }
+    
+    // Filtro de QR Code
+    if (qrFilter !== '') {
+        const hasQR = qrFilter === 'true';
+        filteredTables = filteredTables.filter(table => !!table.qr_code_generated === hasQR);
+    }
+    
+    displayTables(filteredTables);
+}
+
+// Limpar filtros
+function clearTableFilters() {
+    document.getElementById('tableSearch').value = '';
+    document.getElementById('tableRestaurantFilter').value = '';
+    document.getElementById('tableStatusFilter').value = '';
+    document.getElementById('tableQRFilter').value = '';
+    applyTableFilters();
+}
+
+// Configurar filtros
+function setupTableFilters() {
+    const searchInput = document.getElementById('tableSearch');
+    const restaurantFilter = document.getElementById('tableRestaurantFilter');
+    const statusFilter = document.getElementById('tableStatusFilter');
+    const qrFilter = document.getElementById('tableQRFilter');
+    
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyTableFilters, 300);
+        });
+    }
+    
+    [restaurantFilter, statusFilter, qrFilter].forEach(filter => {
+        if (filter) {
+            filter.addEventListener('change', applyTableFilters);
+        }
+    });
+}
 // Função para obter token de autenticação
 function getAuthToken() {
     const stored = localStorage.getItem('access_token');
@@ -2824,6 +3498,8 @@ function setupUserFilters() {
                 loadCategories();
             } else if (sectionName === 'products') {
                 loadProducts();
+            } else if (sectionName === 'tables') {
+                loadTables();
             }
         }
 
@@ -2969,7 +3645,8 @@ async function loadDataConditionally() {
             loadRestaurantStats(),
             loadCategoryStats(), 
             loadProductStats(),
-            loadPromotionStats()
+            loadPromotionStats(),
+            loadTableStats() // Carregar stats de mesas
         ];
         
         // Se for super admin, carregar stats de usuários
@@ -3047,6 +3724,50 @@ async function loadDataConditionally() {
                 showLoading(false);
             }
         }
+
+        // Carregar estatísticas de mesas
+async function loadTableStats() {
+    try {
+        let url = `${apiBaseUrl}/tables/stats`;
+        
+        // Filtrar por restaurante se for restaurant_user
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `?restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('tableCount').textContent = data.data?.active || 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar stats de mesas:', error);
+        document.getElementById('tableCount').textContent = '--';
+    }
+}
+
+// Função para adicionar ao inicializador principal
+function initTablesSection() {
+    // Configurar filtros
+    setupTableFilters();
+    
+    // Configurar formulários
+    if (document.getElementById('tableForm')) {
+        setupTableForm();
+    }
+    
+    if (document.getElementById('batchTableForm')) {
+        setupBatchTableForm();
+    }
+    
+    // Carregar dados se a seção de mesas estiver ativa
+    if (document.getElementById('tables').classList.contains('active')) {
+        loadTables();
+    }
+}
 
         async function loadRestaurants() {
             try {
@@ -3208,7 +3929,9 @@ async function loadDataConditionally() {
         } else if (type === 'user') {
             openUserModal(data);
             return;
-        }
+        } else if (type === 'table') {
+            openTableModal(data);
+        } 
          else {
             form.reset();
         }
@@ -3226,6 +3949,9 @@ async function loadDataConditionally() {
         document.getElementById('productModal').style.display = 'none';
     } else  if (type === 'user') {
         document.getElementById('userModal').style.display = 'none';
+    } else if (type === 'table') {
+        document.getElementById('tableModal').style.display = 'none';
+        currentTableEditId = null;
     }
     currentEditId = null;
         }
@@ -3376,7 +4102,10 @@ async function loadDataConditionally() {
              const logoutModal = document.getElementById('logoutModal');
     const profileModal = document.getElementById('profileModal');
     const passwordModal = document.getElementById('passwordModal');
-            
+            const batchTableModal = document.getElementById('batchTableModal');
+    const qrManagerModal = document.getElementById('qrManagerModal');
+    const tableModal = document.getElementById('tableModal');
+
             if (event.target === restaurantModal) {
                 closeModal('restaurant');
             } else if (event.target === categoryModal) {
@@ -3389,6 +4118,12 @@ async function loadDataConditionally() {
                 closeProfileModal();
             } else if (event.target === passwordModal) {
                 closePasswordModal();
+            } else if (event.target === batchTableModal) {
+                closeBatchTableModal();
+            } else if (event.target === qrManagerModal) {
+                closeQRManagerModal();
+            } else if (event.target === tableModal) {
+                closeModal('table');
             }
         }
 
@@ -3444,6 +4179,10 @@ async function loadDataConditionally() {
         setInterval(() => {
             loadStatsInBackground();
         }, 5 * 60 * 1000);
+
+        setTimeout(() => {
+        initTablesSection();
+    }, 200);
         
     } catch (error) {
         console.error('Erro ao inicializar dashboard:', error);
@@ -4110,6 +4849,47 @@ function openProductModal(data = null) {
     modal.style.display = 'block';
 }
 
+
+// Modal de mesa individual
+function openTableModal(data = null) {
+    const modal = document.getElementById('tableModal');
+    const title = document.getElementById('tableModalTitle');
+    const form = document.getElementById('tableForm');
+    
+    currentTableEditId = data ? data.id : null;
+    title.textContent = data ? 'Editar Mesa' : 'Nova Mesa';
+    
+    // Popular select de restaurantes
+    const restaurantSelect = document.getElementById('tableRestaurant');
+    restaurantSelect.innerHTML = '<option value="">Selecione um restaurante</option>';
+    restaurantsData.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantSelect.appendChild(option);
+    });
+    
+    if (data) {
+        document.getElementById('tableRestaurant').value = data.restaurant_id || '';
+        document.getElementById('tableNumber').value = data.table_number || '';
+        document.getElementById('tableName').value = data.name || '';
+        document.getElementById('tableCapacity').value = data.capacity || 4;
+        document.getElementById('tableActive').checked = data.is_active !== false;
+    } else {
+        form.reset();
+        document.getElementById('tableCapacity').value = 4;
+        document.getElementById('tableActive').checked = true;
+    }
+    
+    // Se for restaurant_user, pré-selecionar restaurante
+    if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+        document.getElementById('tableRestaurant').value = currentUser.restaurant_id;
+        document.getElementById('tableRestaurant').disabled = true;
+    }
+    
+    modal.style.display = 'block';
+}
+
 /**
  * Salvar produto (criar/editar)
  */
@@ -4633,6 +5413,590 @@ async function moveProductToCategory(productId, newCategoryId) {
     }
 }
 
+
+// Salvar mesa
+async function saveTable(formData) {
+    try {
+        showLoading(true);
+        
+        const method = currentTableEditId ? 'PUT' : 'POST';
+        const url = currentTableEditId 
+            ? `${apiBaseUrl}/tables/${currentTableEditId}` 
+            : `${apiBaseUrl}/tables`;
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                credentials: 'include'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(currentTableEditId ? 'Mesa atualizada com sucesso!' : 'Mesa criada com sucesso!');
+            closeModal('table');
+            await loadTables();
+            await loadTableStats();
+        } else {
+            throw new Error(data.message || 'Erro ao salvar mesa');
+        }
+    } catch (error) {
+        showError('Erro ao salvar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Configurar formulário de mesa
+function setupTableForm() {
+    const form = document.getElementById('tableForm');
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            restaurant_id: parseInt(document.getElementById('tableRestaurant').value),
+            table_number: parseInt(document.getElementById('tableNumber').value),
+            name: document.getElementById('tableName').value.trim() || null,
+            capacity: parseInt(document.getElementById('tableCapacity').value),
+            is_active: document.getElementById('tableActive').checked
+        };
+        
+        await saveTable(formData);
+    });
+}
+
+// Editar mesa
+async function editTable(id) {
+    try {
+        const response = await fetch(`${apiBaseUrl}/tables/${id}`, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            openTableModal(data.data);
+        } else {
+            throw new Error('Mesa não encontrada');
+        }
+    } catch (error) {
+        showError('Erro ao carregar mesa: ' + error.message);
+    }
+}
+
+// Deletar mesa
+async function deleteTable(id) {
+    const table = allTablesData.find(t => t.id === id);
+    if (!table) return;
+    
+    const confirmMsg = `Tem certeza que deseja deletar a Mesa ${table.table_number}?\n\nEsta ação não pode ser desfeita.`;
+    
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${apiBaseUrl}/tables/${id}`, {
+            method: 'DELETE',
+            headers: { credentials: 'include' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess('Mesa deletada com sucesso!');
+            await loadTables();
+            await loadTableStats();
+        } else {
+            throw new Error(data.message || 'Erro ao deletar mesa');
+        }
+    } catch (error) {
+        showError('Erro ao deletar: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Alternar status da mesa
+async function toggleTableStatus(id, currentStatus) {
+    try {
+        showLoading(true);
+        
+        const endpoint = currentStatus 
+            ? `${apiBaseUrl}/tables/${id}` 
+            : `${apiBaseUrl}/tables/${id}/reactivate`;
+        
+        const method = currentStatus ? 'DELETE' : 'PATCH';
+        
+        const response = await fetch(endpoint, { 
+            method,
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`Mesa ${currentStatus ? 'inativada' : 'reativada'} com sucesso!`);
+            await loadTables();
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showError('Erro: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * FUNÇÕES DE LOTE
+ */
+
+// Modal de criação em lote
+function openBatchTableModal() {
+    const modal = document.getElementById('batchTableModal');
+    const restaurantSelect = document.getElementById('batchRestaurant');
+    
+    // Popular restaurantes
+    restaurantSelect.innerHTML = '<option value="">Selecione um restaurante</option>';
+    restaurantsData.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantSelect.appendChild(option);
+    });
+    
+    // Pré-selecionar se for restaurant_user
+    if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+        restaurantSelect.value = currentUser.restaurant_id;
+        restaurantSelect.disabled = true;
+    }
+    
+    modal.style.display = 'block';
+}
+
+function closeBatchTableModal() {
+    document.getElementById('batchTableModal').style.display = 'none';
+    document.getElementById('batchTableForm').reset();
+}
+
+// Configurar formulário de lote
+function setupBatchTableForm() {
+    const form = document.getElementById('batchTableForm');
+    
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const startNumber = parseInt(document.getElementById('startNumber').value);
+        const endNumber = parseInt(document.getElementById('endNumber').value);
+        const restaurantId = parseInt(document.getElementById('batchRestaurant').value);
+        
+        if (startNumber > endNumber) {
+            showError('Número inicial deve ser menor que o final');
+            return;
+        }
+        
+        if (endNumber - startNumber > 100) {
+            showError('Máximo de 100 mesas por vez');
+            return;
+        }
+        
+        try {
+            showLoading(true);
+            
+            const response = await fetch(`${apiBaseUrl}/restaurants/${restaurantId}/tables/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    credentials: 'include'
+                },
+                body: JSON.stringify({
+                    start_number: startNumber,
+                    end_number: endNumber,
+                    capacity: parseInt(document.getElementById('batchCapacity').value) || 4
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showSuccess(`${data.data.total_created} mesas criadas com sucesso!`);
+                closeBatchTableModal();
+                await loadTables();
+                await loadTableStats();
+            } else {
+                throw new Error(data.message || 'Erro ao criar mesas');
+            }
+        } catch (error) {
+            showError('Erro: ' + error.message);
+        } finally {
+            showLoading(false);
+        }
+    });
+}
+
+/**
+ * FUNÇÕES DE QR CODE
+ */
+
+// Modal de gerenciamento de QR
+function openQRManagerModal() {
+    const modal = document.getElementById('qrManagerModal');
+    const restaurantSelect = document.getElementById('qrRestaurant');
+    
+    // Popular restaurantes
+    restaurantSelect.innerHTML = '<option value="">Selecione um restaurante</option>';
+    restaurantsData.forEach(restaurant => {
+        const option = document.createElement('option');
+        option.value = restaurant.id;
+        option.textContent = restaurant.name;
+        restaurantSelect.appendChild(option);
+    });
+    
+    // Pré-selecionar se for restaurant_user
+    if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+        restaurantSelect.value = currentUser.restaurant_id;
+        restaurantSelect.disabled = true;
+        loadRestaurantTables();
+    }
+    
+    modal.style.display = 'block';
+}
+
+function closeQRManagerModal() {
+    document.getElementById('qrManagerModal').style.display = 'none';
+    clearQRPreview();
+}
+
+// Carregar mesas do restaurante para QR
+async function loadRestaurantTables() {
+    const restaurantId = document.getElementById('qrRestaurant').value;
+    if (!restaurantId) return;
+    
+    try {
+        const response = await fetch(`${apiBaseUrl}/restaurants/${restaurantId}/tables`, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            const tables = data.data || [];
+            
+            // Popular select individual
+            const tableSelect = document.getElementById('qrTableSelect');
+            tableSelect.innerHTML = '<option value="">Selecione uma mesa</option>';
+            tables.forEach(table => {
+                const option = document.createElement('option');
+                option.value = table.table_number;
+                option.textContent = `Mesa ${table.table_number}${table.name ? ` - ${table.name}` : ''}`;
+                tableSelect.appendChild(option);
+            });
+            
+            // Popular checkboxes para lote
+            const checkboxList = document.getElementById('tableCheckboxList');
+            checkboxList.innerHTML = tables.map(table => `
+                <div class="table-checkbox-item">
+                    <input type="checkbox" id="table_${table.table_number}" value="${table.table_number}">
+                    <label for="table_${table.table_number}">
+                        Mesa ${table.table_number}${table.name ? ` - ${table.name}` : ''} 
+                        ${table.qr_code_generated ? '(tem QR)' : ''}
+                    </label>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        showError('Erro ao carregar mesas: ' + error.message);
+    }
+}
+
+// Alternar tabs do QR
+function switchQRTab(tabName) {
+    // Remover active de todas as tabs e conteúdos
+    document.querySelectorAll('.qr-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.qr-tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Adicionar active na tab e conteúdo selecionados
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(`qrTab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+    
+    clearQRPreview();
+}
+
+// Gerar QR individual
+async function generateSingleQR() {
+    const restaurantId = document.getElementById('qrRestaurant').value;
+    const tableNumber = document.getElementById('qrTableSelect').value;
+    const format = document.getElementById('qrFormat').value;
+    const size = document.getElementById('qrSize').value;
+    
+    if (!restaurantId || !tableNumber) {
+        showError('Selecione restaurante e mesa');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        
+        const url = `${apiBaseUrl}/qr/restaurant/${restaurantId}/table/${tableNumber}?format=${format}&size=${size}`;
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        
+        if (format === 'json') {
+            const data = await response.json();
+            if (data.success) {
+                showQRPreview(data.data.qr_code.data_url, `Mesa ${tableNumber}`, data.data.qr_code.url);
+                showSuccess('QR Code gerado com sucesso!');
+            } else {
+                throw new Error(data.message);
+            }
+        } else {
+            const blob = await response.blob();
+            const url_blob = URL.createObjectURL(blob);
+            showQRPreview(url_blob, `Mesa ${tableNumber}`, url);
+            showSuccess('QR Code gerado com sucesso!');
+        }
+        
+        // Atualizar dados das mesas
+        await loadTables();
+        
+    } catch (error) {
+        showError('Erro ao gerar QR: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Mostrar preview do QR
+function showQRPreview(imageUrl, tableName, menuUrl) {
+    const preview = document.getElementById('qrPreview');
+    preview.innerHTML = `
+        <div class="qr-preview-container">
+            <h3>${tableName}</h3>
+            <img src="${imageUrl}" alt="QR Code ${tableName}" style="max-width: 300px;">
+            <p style="margin-top: 15px; word-break: break-all; font-size: 0.9rem; color: var(--black2);">
+                URL: ${menuUrl}
+            </p>
+            <div style="margin-top: 20px;">
+                <button class="btn-secondary" onclick="downloadQR('${imageUrl}', '${tableName}')">
+                    <ion-icon name="download-outline"></ion-icon> Download
+                </button>
+                <button class="btn-secondary" onclick="shareQR('${menuUrl}')">
+                    <ion-icon name="share-outline"></ion-icon> Compartilhar
+                </button>
+            </div>
+        </div>
+    `;
+    preview.style.display = 'block';
+}
+
+function clearQRPreview() {
+    const preview = document.getElementById('qrPreview');
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+}
+
+// Download do QR
+function downloadQR(imageUrl, tableName) {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `qr-${tableName.toLowerCase().replace(/\s+/g, '-')}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Compartilhar QR
+async function shareQR(url) {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Menu Digital',
+                text: 'Acesse nosso menu digital',
+                url: url
+            });
+        } catch (error) {
+            console.log('Erro ao compartilhar:', error);
+            copyToClipboard(url);
+        }
+    } else {
+        copyToClipboard(url);
+    }
+}
+
+// Copiar para clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showSuccess('URL copiada para a área de transferência!');
+    }).catch(() => {
+        showError('Erro ao copiar URL');
+    });
+}
+
+// Selecionar/deselecionar todas as mesas
+function selectAllTables() {
+    document.querySelectorAll('#tableCheckboxList input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+}
+
+function deselectAllTables() {
+    document.querySelectorAll('#tableCheckboxList input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+
+// Gerar QR em lote
+async function generateBatchQR() {
+    const restaurantId = document.getElementById('qrRestaurant').value;
+    const checkedBoxes = document.querySelectorAll('#tableCheckboxList input[type="checkbox"]:checked');
+    
+    if (!restaurantId) {
+        showError('Selecione um restaurante');
+        return;
+    }
+    
+    if (checkedBoxes.length === 0) {
+        showError('Selecione pelo menos uma mesa');
+        return;
+    }
+    
+    const tableNumbers = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+    
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${apiBaseUrl}/qr/restaurant/${restaurantId}/tables/batch`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                credentials: 'include'
+            },
+            body: JSON.stringify({
+                table_numbers: tableNumbers,
+                format: 'json'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showBatchQRResults(data.data);
+            showSuccess(`${data.data.summary.successful} QR Codes gerados com sucesso!`);
+            await loadTables();
+        } else {
+            throw new Error(data.message);
+        }
+        
+    } catch (error) {
+        showError('Erro ao gerar QR Codes: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Mostrar resultados do lote
+function showBatchQRResults(data) {
+    const resultsDiv = document.getElementById('batchQRResults');
+    const results = data.results || [];
+    
+    resultsDiv.innerHTML = `
+        <h4>Resultados:</h4>
+        <p><strong>Total:</strong> ${data.summary.total_requested} | 
+           <strong>Sucesso:</strong> ${data.summary.successful} | 
+           <strong>Falha:</strong> ${data.summary.failed}</p>
+        
+        <div style="max-height: 300px; overflow-y: auto; margin-top: 15px;">
+            ${results.map(result => `
+                <div class="qr-batch-result ${result.success ? 'qr-batch-success' : 'qr-batch-error'}">
+                    ${result.success ? `
+                        <strong>Mesa ${result.table.number}</strong> - QR gerado com sucesso
+                        <br><small>${result.qr_code.url}</small>
+                    ` : `
+                        <strong>Mesa ${result.table_number}</strong> - Erro: ${result.error}
+                    `}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Abrir página de impressão
+function openPrintPage() {
+    const restaurantId = document.getElementById('qrRestaurant').value;
+    if (!restaurantId) {
+        showError('Selecione um restaurante');
+        return;
+    }
+    
+    const printSelection = document.querySelector('input[name="printSelection"]:checked').value;
+    let url = `${apiBaseUrl}/qr/restaurant/${restaurantId}/print`;
+    
+    if (printSelection === 'selected') {
+        const tableNumbers = document.getElementById('printTableNumbers').value.trim();
+        if (!tableNumbers) {
+            showError('Digite os números das mesas para impressão');
+            return;
+        }
+        url += `?table_numbers=${encodeURIComponent(tableNumbers)}`;
+    }
+    
+    window.open(url, '_blank');
+}
+
+// Gerar QR para mesa específica (ação rápida)
+async function generateTableQR(tableId) {
+    const table = allTablesData.find(t => t.id === tableId);
+    if (!table) return;
+    
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${apiBaseUrl}/qr/restaurant/${table.restaurant_id}/table/${table.table_number}?format=json`, {
+            headers: { credentials: 'include' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`QR Code gerado para Mesa ${table.table_number}!`);
+            await loadTables();
+            
+            // Opção de download
+            if (confirm('QR Code gerado! Deseja fazer download?')) {
+                const link = document.createElement('a');
+                link.href = data.data.qr_code.data_url;
+                link.download = `qr-mesa-${table.table_number}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } else {
+            throw new Error(data.message);
+        }
+        
+    } catch (error) {
+        showError('Erro ao gerar QR: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Visualizar menu da mesa
+function previewTableMenu(restaurantId, tableNumber) {
+    // Buscar dados do restaurante
+    const restaurant = restaurantsData.find(r => r.id === restaurantId);
+    if (!restaurant) {
+        showError('Restaurante não encontrado');
+        return;
+    }
+    
+    const menuUrl = `${apiBaseUrl}/menu/restaurant/${restaurant.uuid}/table/${tableNumber}`;
+    window.open(menuUrl, '_blank');
+}
 
     </script>
 
