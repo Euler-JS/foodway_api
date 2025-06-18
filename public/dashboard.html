@@ -1075,7 +1075,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item" data-section="users">
+                <li class="nav-item" data-section="users" onclick="loadUsers()">
                     <a href="#">
                         <span class="icon">
                             <ion-icon name="people-outline"></ion-icon>
@@ -2169,7 +2169,8 @@ async function loadUsers() {
         showLoading(true);
         const response = await fetch(`${apiBaseUrl}/users`, {
             headers: {
-                'Authorization': `Bearer ${getAuthToken()}`
+                // 'Authorization': `Bearer ${getAuthToken()}`
+                credentials: 'include'
             }
         });
         const data = await response.json();
@@ -2612,8 +2613,9 @@ function setupUserFilters() {
 
                 const responseUsers = await fetch(`${apiBaseUrl}/users/stats`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        credentials: 'include'
+                        // 'Authorization': `Bearer ${token}`,
+                        // 'Content-Type': 'application/json'
                     }
                 });
                 const dataUsers = await responseUsers.json();
@@ -3002,6 +3004,7 @@ function setupUserFilters() {
             await loadRestaurants();
             await loadCategories();
             await loadCategoriesForProducts();
+            // await loadUsers();
 
             // Carregar utilizadores
             if (document.getElementById('userGrid')) {
