@@ -13,6 +13,7 @@ const { authenticate, optionalAuthenticate, setSupabaseContext } = require('./mi
 const cookieParser = require('cookie-parser'); // npm install cookie-parser
 const { protectRoute, requireAdminAccess } = require('./middleware/routeProtection');
 
+const qrCodeRoutes = require('./routes/qrCode');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -167,6 +168,8 @@ app.use('/api/v1/restaurants/:restaurant_id/products', restaurantProductRoutes);
 // Rotas de mesas
 app.use('/api/v1/tables', tableRoutes);
 app.use('/api/v1/restaurants/:restaurant_id/tables', restaurantTableRoutes);
+
+app.use('/api/v1/qr', qrCodeRoutes);
 
 // Rota de menu (pública para visualização)
 app.use('/api/v1/menu', menuRoutes);
