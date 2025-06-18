@@ -36,7 +36,8 @@ const validateQRQuery = (req, res, next) => {
   const schema = Joi.object({
     format: Joi.string().valid('png', 'svg', 'json').optional().default('png'),
     size: Joi.number().integer().min(100).max(500).optional().default(200),
-    table_numbers: Joi.string().optional()
+    table_numbers: Joi.string().optional(),
+    type: Joi.string().valid('tables', 'restaurant').optional().default('tables'), // Nova opção
   });
 
   const { error, value } = schema.validate(req.query);

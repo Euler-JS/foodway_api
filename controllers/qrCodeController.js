@@ -495,6 +495,249 @@ class QRCodeController {
       next(error);
     }
   }
+
+  /**
+   * Gerar página de impressão para QR Codes
+   * GET /api/v1/qr/restaurant/:restaurant_id/print
+   */
+  async generatePrintPage(req, res, next) {
+    try {
+      const { restaurant_id } = req.params;
+      const { table_numbers, layout = 'grid', type = 'tables' } = req.query;
+
+      // Verificar se o restaurante existe
+      const restaurant = await Restaurant.findById(restaurant_id);
+      
+      const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
+      
+      const qrOptions = {
+        type: 'svg',
+        width: 150,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      };
+
+      let qrCodesHtml = '';
+      
+      if (type === 'restaurant') {
+        // Gerar QR para o restaurante
+        const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}`;
+        const qrSvg = await QRCode.toString(menuUrl, qrOptions);
+        
+        qrCodesHtml = `
+          <div class="qr-item restaurant-qr">
+            <div class="qr-code">${qrSvg}</div>
+            <div class="qr-info">
+              <h3>Menu do Restaurante</h3>
+              <p><strong>${restaurant.name}</strong></p>
+              <p>${restaurant.city || 'Cidade não informada'}</p>
+              <!--<p class="qr-description">QR Geral do Menu</p>-->
+              <!--<p class="url-small">${menuUrl}</p>-->
+            </div>
+          </div>
+        `;
+      } else {
+        // Processar mesas (código existente)
+        let tablesToPrint = [];
+        
+        if (table_numbers) {
+          const numbers = table_numbers.split(',').map(n => parseInt(n.trim()));
+          for (const number of numbers) {
+            try {
+              const table = await Table.findByRestaurantAndNumber(restaurant_id, number);
+              tablesToPrint.push(table);
+            } catch (error) {
+              // Ignorar mesas que não existem
+            }
+          }
+        } else {
+          // Se não especificou mesas, pegar todas as ativas
+          tablesToPrint = await Table.findByRestaurant(restaurant_id, { isActive: true });
+        }
+
+        if (tablesToPrint.length === 0) {
+          throw new AppError('Nenhuma mesa encontrada para impressão', 404);
+        }
+
+        for (const table of tablesToPrint) {
+          const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}&table=${table.table_number}`;
+          const qrSvg = await QRCode.toString(menuUrl, qrOptions);
+          
+          qrCodesHtml += `
+            <div class="qr-item">
+              <div class="qr-code">${qrSvg}</div>
+              <div class="qr-info">
+                <h3>Mesa ${table.table_number}</h3>
+                <p>${restaurant.name}</p>
+                ${table.name ? `<p class="table-name">${table.name}</p>` : ''}
+                <p class="capacity">${table.capacity} pessoas</p>
+                <!--<p class="url-small">${menuUrl}</p>-->
+                <p class="url-small">Manna Software</p>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      const printTitle = type === 'restaurant' ? 'QR Code do Menu' : 'QR Codes das Mesas';
+      const printSubtitle = type === 'restaurant' ? 'Menu Geral' : `Total de mesas: ${qrCodesHtml.split('qr-item').length - 1}`;
+
+      const printHtml = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manna Software - ${restaurant.name}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            color: black;
+        }
+        
+        .print-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 2px solid #333;
+        }
+        
+        .print-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .print-header p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .qr-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .qr-item {
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            page-break-inside: avoid;
+            background: white;
+        }
+        
+        .restaurant-qr {
+            border-color: #FF5722;
+            background: #FFF8F6;
+        }
+        
+        .qr-code {
+            margin-bottom: 15px;
+        }
+        
+        .qr-code svg {
+            max-width: 150px;
+            height: auto;
+        }
+        
+        .qr-info h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .restaurant-qr .qr-info h3 {
+            color: #FF5722;
+            font-size: 20px;
+        }
+        
+        .qr-info p {
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #666;
+        }
+        
+        .table-name {
+            font-weight: bold;
+            color: #333 !important;
+        }
+        
+        .capacity {
+            font-style: italic;
+        }
+        
+        .qr-description {
+            font-weight: bold;
+            color: #FF5722 !important;
+            font-size: 13px !important;
+        }
+        
+        .url-small {
+            font-size: 8px !important;
+            word-break: break-all;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media print {
+            body { background: white; }
+            .print-header { border-bottom: 2px solid #000; }
+            .qr-item { border: 2px solid #000; }
+            .restaurant-qr { border-color: #000; background: white; }
+            .url-small { display: none; }
+        }
+        
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            // Auto-print quando carregar (opcional)
+            // window.print();
+        }
+        
+        function printPage() {
+            window.print();
+        }
+    </script>
+</head>
+<body>
+    <div class="print-header">
+        <h1>Manna Software</h1>
+        <p><strong>${restaurant.name}</strong></p>
+        <p>${printSubtitle}</p>
+        <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+        <button onclick="printPage()" style="margin-top: 10px; padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            🖨️ Imprimir
+        </button>
+    </div>
+    
+    <div class="qr-container">
+        ${qrCodesHtml}
+    </div>
+</body>
+</html>
+      `;
+
+      res.set('Content-Type', 'text/html');
+      return res.send(printHtml);
+
+    } catch (error) {
+      next(error);
+    }
+  }
+  
 }
 
 module.exports = new QRCodeController();

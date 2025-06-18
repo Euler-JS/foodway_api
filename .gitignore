@@ -65,7 +65,7 @@ dist
 
 # ==================== GATSBY FILES ====================
 .cache/
-public
+# public
 
 # ==================== VUEPRESS BUILD OUTPUT ====================
 .vuepress/dist

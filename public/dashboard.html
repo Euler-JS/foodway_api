@@ -2062,13 +2062,55 @@
         
         <!-- Tabs -->
         <div class="qr-tabs" style="display: flex; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px;">
-            <button class="qr-tab active" data-tab="individual" onclick="switchQRTab('individual')">QR Individual</button>
+            <button class="qr-tab active" data-tab="restaurant" onclick="switchQRTab('restaurant')">Restaurante</button>
+            <button class="qr-tab" data-tab="individual" onclick="switchQRTab('individual')">QR Individual</button>
             <button class="qr-tab" data-tab="batch" onclick="switchQRTab('batch')">QR em Lote</button>
             <button class="qr-tab" data-tab="print" onclick="switchQRTab('print')">Imprimir</button>
         </div>
+
+        <!-- Tab Restaurante -->
+        <div id="qrTabRestaurant" class="qr-tab-content active">
+            <!-- <div class="form-group">
+                <label for="qrTableSelect">Mesa:</label>
+                <select id="qrTableSelect" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                    <option value="">Selecione uma mesa</option>
+                </select>
+            </div> -->
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                <div class="form-group">
+                    <label>Formato:</label>
+                    <select id="qrFormat" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        <option value="png">PNG</option>
+                        <option value="svg">SVG</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tamanho:</label>
+                    <select id="qrSize" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        <option value="150">150px</option>
+                        <option value="200" selected>200px</option>
+                        <option value="300">300px</option>
+                        <option value="400">400px</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn-primary" onclick="generateRestaurantQR()">
+                    <ion-icon name="qr-code-outline" style="margin-right: 8px;"></ion-icon>
+                    Gerar QR Code
+                </button>
+            </div>
+            
+            <div id="qrPreview" style="text-align: center; margin-top: 20px; display: none;">
+                <!-- QR preview will appear here -->
+            </div>
+        </div>
         
         <!-- Tab Individual -->
-        <div id="qrTabIndividual" class="qr-tab-content active">
+        <div id="qrTabIndividual" class="qr-tab-content">
             <div class="form-group">
                 <label for="qrTableSelect">Mesa:</label>
                 <select id="qrTableSelect" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
@@ -2134,9 +2176,27 @@
             </div>
         </div>
         
-        <!-- Tab Imprimir -->
+       <!-- Tab Imprimir -->
         <div id="qrTabPrint" class="qr-tab-content">
+            <!-- Tipo de QR para imprimir -->
             <div class="form-group">
+                <label>Tipo de QR Code:</label>
+                <div style="margin: 15px 0;">
+                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="radio" name="printType" value="restaurant" style="margin-right: 8px;" onchange="togglePrintOptions()">
+                        <ion-icon name="storefront-outline" style="margin-right: 5px;"></ion-icon>
+                        QR do Restaurante (Menu Geral)
+                    </label>
+                    <label style="display: flex; align-items: center;">
+                        <input type="radio" name="printType" value="tables" checked style="margin-right: 8px;" onchange="togglePrintOptions()">
+                        <ion-icon name="grid-outline" style="margin-right: 5px;"></ion-icon>
+                        QR das Mesas
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Opções para impressão de mesas (visível por padrão) -->
+            <div id="tablesPrintOptions" class="form-group">
                 <label>Mesas para Impressão:</label>
                 <div style="margin: 10px 0;">
                     <label>
@@ -2150,6 +2210,17 @@
                         Apenas mesas selecionadas:
                     </label>
                     <input type="text" id="printTableNumbers" placeholder="Ex: 1,2,3,5,8" style="margin-left: 10px; padding: 8px; width: 200px;">
+                </div>
+            </div>
+            
+            <!-- Descrição para QR de restaurante (oculta por padrão) -->
+            <div id="restaurantPrintOptions" class="form-group" style="display: none;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #FF5722;">
+                    <p style="margin: 0; color: #333;">
+                        <ion-icon name="information-circle-outline" style="margin-right: 5px;"></ion-icon>
+                        <strong>QR do Restaurante:</strong> Gera um QR code que leva direto ao menu principal, 
+                        sem especificar mesa. Ideal para entrada do estabelecimento, redes sociais ou materiais promocionais.
+                    </p>
                 </div>
             </div>
             
@@ -4033,6 +4104,141 @@ function initTablesSection() {
             window.open(url, '_blank');
         }
 
+        // Função para alternar opções de impressão baseado no tipo selecionado
+function togglePrintOptions() {
+    const printType = document.querySelector('input[name="printType"]:checked').value;
+    const tablesPrintOptions = document.getElementById('tablesPrintOptions');
+    const restaurantPrintOptions = document.getElementById('restaurantPrintOptions');
+    
+    if (printType === 'restaurant') {
+        tablesPrintOptions.style.display = 'none';
+        restaurantPrintOptions.style.display = 'block';
+    } else {
+        tablesPrintOptions.style.display = 'block';
+        restaurantPrintOptions.style.display = 'none';
+    }
+}
+
+// Abrir página de impressão (função atualizada)
+function openPrintPage() {
+    const restaurantId = document.getElementById('qrRestaurant').value;
+    if (!restaurantId) {
+        showError('Selecione um restaurante');
+        return;
+    }
+    
+    const printType = document.querySelector('input[name="printType"]:checked').value;
+    let url = `${apiBaseUrl}/qr/restaurant/${restaurantId}/print?type=${printType}`;
+    
+    if (printType === 'tables') {
+        const printSelection = document.querySelector('input[name="printSelection"]:checked').value;
+        
+        if (printSelection === 'selected') {
+            const tableNumbers = document.getElementById('printTableNumbers').value.trim();
+            if (!tableNumbers) {
+                showError('Digite os números das mesas para impressão');
+                return;
+            }
+            url += `&table_numbers=${encodeURIComponent(tableNumbers)}`;
+        }
+    }
+    
+    window.open(url, '_blank');
+}
+
+// Função para gerar QR do restaurante (ação rápida) - nova função
+async function generateRestaurantQR(restaurantId) {
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${apiBaseUrl}/qr/restaurant/${restaurantId}?format=json`, {
+            headers: { credentials: 'include' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess('QR Code do restaurante gerado!');
+            
+            // Opção de download
+            if (confirm('QR Code do restaurante gerado! Deseja fazer download?')) {
+                const link = document.createElement('a');
+                link.href = data.data.qr_code.data_url;
+                link.download = `qr-restaurante-${restaurantId}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } else {
+            throw new Error(data.message);
+        }
+        
+    } catch (error) {
+        showError('Erro ao gerar QR: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Função para mostrar informações detalhadas do QR do restaurante
+function showRestaurantQRInfo(restaurantId) {
+    const restaurant = restaurantsData.find(r => r.id === restaurantId);
+    if (!restaurant) {
+        showError('Restaurante não encontrado');
+        return;
+    }
+    
+    const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
+    const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}`;
+    
+    const infoHtml = `
+        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 20px auto;">
+            <h3 style="color: var(--primary-color); margin-bottom: 20px; text-align: center;">
+                <ion-icon name="qr-code-outline"></ion-icon>
+                QR Code do Restaurante
+            </h3>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">${restaurant.name}</h4>
+                <p style="margin: 5px 0;"><strong>Cidade:</strong> ${restaurant.city || 'Não informada'}</p>
+                <p style="margin: 5px 0;"><strong>URL do Menu:</strong></p>
+                <p style="font-size: 0.9rem; word-break: break-all; color: #666;">${menuUrl}</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn-primary" onclick="generateRestaurantQR(${restaurantId}); this.closest('.modal').style.display='none'">
+                    <ion-icon name="download-outline"></ion-icon>
+                    Gerar & Download QR
+                </button>
+                <button class="btn-secondary" onclick="copyToClipboard('${menuUrl}'); this.closest('.modal').style.display='none'">
+                    <ion-icon name="copy-outline"></ion-icon>
+                    Copiar URL
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Criar modal temporário para mostrar info
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+            ${infoHtml}
+            <span class="close" onclick="this.closest('.modal').remove()" style="position: absolute; top: 20px; right: 30px; font-size: 2rem;">&times;</span>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Remover modal ao clicar fora
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
         // Utility Functions
         function showLoading(show) {
             document.getElementById('loading').style.display = show ? 'block' : 'none';
@@ -5723,6 +5929,47 @@ function switchQRTab(tabName) {
     
     clearQRPreview();
 }
+// Gerar QR Restaurante
+async function generateRestaurantQR() {
+    const restaurantId = document.getElementById('qrRestaurant').value;
+    const tableNumber = "000"
+    const format = document.getElementById('qrFormat').value;
+    const size = document.getElementById('qrSize').value;
+    
+    
+    try {
+        showLoading(true);
+        
+        const url = `${apiBaseUrl}/qr/restaurant/${restaurantId}?format=${format}&size=${size}`;
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        
+        if (format === 'json') {
+            const data = await response.json();
+            if (data.success) {
+                showQRPreview(data.data.qr_code.data_url,'Restaurante', data.data.qr_code.url);
+                showSuccess('QR Code gerado com sucesso!');
+            } else {
+                throw new Error(data.message);
+            }
+        } else {
+            const blob = await response.blob();
+            const url_blob = URL.createObjectURL(blob);
+            showQRPreview(url_blob, 'Restaurante', url);
+            showSuccess('QR Code gerado com sucesso!');
+        }
+        
+        // Atualizar dados das mesas
+        await loadTables();
+        
+    } catch (error) {
+        showError('Erro ao gerar QR: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
 
 // Gerar QR individual
 async function generateSingleQR() {
@@ -5925,27 +6172,27 @@ function showBatchQRResults(data) {
 }
 
 // Abrir página de impressão
-function openPrintPage() {
-    const restaurantId = document.getElementById('qrRestaurant').value;
-    if (!restaurantId) {
-        showError('Selecione um restaurante');
-        return;
-    }
+// function openPrintPage() {
+//     const restaurantId = document.getElementById('qrRestaurant').value;
+//     if (!restaurantId) {
+//         showError('Selecione um restaurante');
+//         return;
+//     }
     
-    const printSelection = document.querySelector('input[name="printSelection"]:checked').value;
-    let url = `${apiBaseUrl}/qr/restaurant/${restaurantId}/print`;
+//     const printSelection = document.querySelector('input[name="printSelection"]:checked').value;
+//     let url = `${apiBaseUrl}/qr/restaurant/${restaurantId}/print`;
     
-    if (printSelection === 'selected') {
-        const tableNumbers = document.getElementById('printTableNumbers').value.trim();
-        if (!tableNumbers) {
-            showError('Digite os números das mesas para impressão');
-            return;
-        }
-        url += `?table_numbers=${encodeURIComponent(tableNumbers)}`;
-    }
+//     if (printSelection === 'selected') {
+//         const tableNumbers = document.getElementById('printTableNumbers').value.trim();
+//         if (!tableNumbers) {
+//             showError('Digite os números das mesas para impressão');
+//             return;
+//         }
+//         url += `?table_numbers=${encodeURIComponent(tableNumbers)}`;
+//     }
     
-    window.open(url, '_blank');
-}
+//     window.open(url, '_blank');
+// }
 
 // Gerar QR para mesa específica (ação rápida)
 async function generateTableQR(tableId) {
