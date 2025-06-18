@@ -11,7 +11,7 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { authenticate, optionalAuthenticate, setSupabaseContext } = require('./middleware/authMiddleware');
 
 const cookieParser = require('cookie-parser'); // npm install cookie-parser
-const { protectRoute, requireSuperAdminRoute } = require('./middleware/routeProtection');
+const { protectRoute, requireAdminAccess } = require('./middleware/routeProtection');
 
 
 const app = express();
@@ -107,7 +107,7 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.get('/dashboard', protectRoute, requireSuperAdminRoute, (req, res) => {
+app.get('/dashboard', protectRoute, requireAdminAccess, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 

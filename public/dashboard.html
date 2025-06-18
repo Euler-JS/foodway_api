@@ -1795,7 +1795,7 @@ async function loadUserInfo() {
     try {
         const response = await fetch(`${apiBaseUrl}/auth/me`, {
             headers: {
-                'Authorization': `Bearer ${getAuthToken()}`
+                credentials: 'include',
             }
         });
         
@@ -1828,6 +1828,107 @@ function updateUserDisplay() {
             const roleText = currentUser.role === 'super_admin' ? 'Super Admin' : 'Usuário do Restaurante';
             userRoleElement.textContent = roleText;
         }
+    }
+}
+
+// Função para controlar visibilidade baseada no role
+function controlRoleBasedAccess() {
+    if (!currentUser) return;
+    
+    const isRestaurantUser = currentUser.role === 'restaurant_user';
+    
+    if (isRestaurantUser) {
+        // 1. Ocultar cards do dashboard
+        const restaurantCard = document.getElementById('restaurantCount')?.closest('.card');
+        const userCard = document.getElementById('userCount')?.closest('.card');
+        
+        if (restaurantCard) restaurantCard.style.display = 'none';
+        if (userCard) userCard.style.display = 'none';
+        
+        // 2. Ocultar seção de restaurantes recentes
+        const recentRestaurantsSection = document.querySelector('.details .recentOrders');
+        if (recentRestaurantsSection) {
+            recentRestaurantsSection.style.display = 'none';
+        }
+        
+        // 3. Ocultar botão "Novo Restaurante" na sidebar de ações rápidas
+        const newRestaurantBtn = document.querySelector('button[onclick="openModal(\'restaurant\')"]');
+        if (newRestaurantBtn) {
+            newRestaurantBtn.style.display = 'none';
+        }
+        
+        // 4. Ocultar itens de navegação
+        const menuItems = [
+            document.querySelector('[data-section="users"]'), // Utilizadores
+            document.querySelector('[data-section="restaurants"]'), // Restaurantes  
+            document.querySelector('[data-section="menu"]'), // Menu Preview
+            document.querySelector('[data-section="api"]'), // API Docs
+        ];
+        
+        menuItems.forEach(item => {
+            if (item) item.style.display = 'none';
+        });
+        
+        // 5. Ocultar Health Check
+        const healthCheckItem = document.querySelector('a[onclick*="health"]')?.closest('li');
+        if (healthCheckItem) {
+            healthCheckItem.style.display = 'none';
+        }
+        
+        // 6. Ajustar layout da seção details (remover grid com 2 colunas)
+        const detailsSection = document.querySelector('.details');
+        if (detailsSection) {
+            detailsSection.style.gridTemplateColumns = '1fr';
+        }
+        
+        // 7. Filtrar dados apenas do restaurante do usuário
+        if (currentUser.restaurant_id) {
+            window.userRestaurantId = currentUser.restaurant_id;
+        }
+        
+        // 8. Atualizar título da sidebar de ações rápidas
+        const quickActionsTitle = document.querySelector('.recentCustomers .cardHeader h2');
+        if (quickActionsTitle) {
+            quickActionsTitle.textContent = 'Ações Rápidas - Meu Restaurante';
+        }
+
+        const cardBox = document.querySelector('.cardBox');
+        if (cardBox) {
+            cardBox.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        }
+    }
+
+    if (isRestaurantUser && currentUser.restaurant_id) {
+        loadUserRestaurantInfo();
+    }
+}
+
+// Função para carregar e exibir informações do restaurante do usuário
+async function loadUserRestaurantInfo() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/restaurants/${currentUser.restaurant_id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const restaurant = data.data;
+            
+            // Atualizar título da página para incluir nome do restaurante
+            const recentCustomersSection = document.querySelector('.recentCustomers');
+            if (recentCustomersSection) {
+                const header = recentCustomersSection.querySelector('.cardHeader h2');
+                if (header) {
+                    header.innerHTML = `
+                        <div style="text-align: left;">
+                            <div style="font-size: 1.2rem; color: var(--primary-color);">Meu Restaurante</div>
+                            <div style="font-size: 0.9rem; color: var(--black2); font-weight: normal;">${restaurant.name}</div>
+                            <div style="font-size: 0.8rem; color: var(--black2); font-weight: normal;">${restaurant.city || 'Cidade não informada'}</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar informações do restaurante:', error);
     }
 }
 
@@ -2750,7 +2851,7 @@ function setupUserFilters() {
         function openModal(type, data = null) {
             
             
-            if (type === 'restaurant') {
+            if (type === 'restaurant' && currentUser?.role === 'restaurant_user') {
                 const modal = document.getElementById('restaurantModal');
                 const title = document.getElementById('modalTitle');
                 const form = document.getElementById('restaurantForm');
@@ -2795,6 +2896,11 @@ function setupUserFilters() {
                     document.getElementById('categoryImage').value = data.image_url || '';
                 } else {
                     form.reset();
+                }
+
+                if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+                    document.getElementById('categoryRestaurant').value = currentUser.restaurant_id;
+                    document.getElementById('categoryRestaurant').disabled = true;
                 }
                 modal.style.display = 'block';
         } else if (type === 'product') {
@@ -2989,6 +3095,9 @@ function setupUserFilters() {
 
         // Initialize everything
         document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserInfo();
+            controlRoleBasedAccess();
+            
             initNavigation();
             setupSearch();
             setupForms();
@@ -3047,7 +3156,11 @@ function setupUserFilters() {
         async function loadCategories() {
             try {
                 showLoading(true);
-                const response = await fetch(`${apiBaseUrl}/categories`);
+                let url = `${apiBaseUrl}/categories`;
+                if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+                    url += `?restaurant_id=${currentUser.restaurant_id}`;
+                }
+                const response = await fetch(url);
                 const data = await response.json();
 
 
@@ -3501,7 +3614,11 @@ async function duplicateCategory(id) {
 async function loadProducts() {
     try {
         showLoading(true);
-        const response = await fetch(`${apiBaseUrl}/products?limit=100`);
+        let url = `${apiBaseUrl}/products?limit=100`;
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
+        }
+        const response = await fetch(url);
         const data = await response.json();
         
         console.log("Dados de Produtos:", data);
@@ -3680,7 +3797,11 @@ function openProductModal(data = null) {
         form.reset();
         document.getElementById('productAvailable').checked = true;
     }
-    
+    if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+        allCategoriesForProducts = allCategoriesForProducts.filter(cat => 
+            cat.restaurant_id === currentUser.restaurant_id
+        );
+    }
     modal.style.display = 'block';
 }
 
