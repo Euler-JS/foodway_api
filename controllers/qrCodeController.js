@@ -84,7 +84,7 @@ class QRCodeController {
       // Construir URL do menu com mesa
       // const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
       const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
-      const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}?table=${table.table_number}`;
+      const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}&table=${table.table_number}`;
 
       // Opções do QR Code
       const qrOptions = {
@@ -185,7 +185,7 @@ class QRCodeController {
           const table = await Table.findByRestaurantAndNumber(restaurant_id, tableNumber);
           
           // Construir URL
-          const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}?table=${table.table_number}`;
+          const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}&table=${table.table_number}`;
           
           // Gerar QR Code
           const dataUrl = await QRCode.toDataURL(menuUrl, qrOptions);
@@ -294,7 +294,7 @@ class QRCodeController {
       let qrCodesHtml = '';
       
       for (const table of tablesToPrint) {
-        const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}?table=${table.table_number}`;
+        const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}&table=${table.table_number}`;
         const qrSvg = await QRCode.toString(menuUrl, qrOptions);
         
         qrCodesHtml += `
