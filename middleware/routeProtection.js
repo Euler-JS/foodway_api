@@ -107,7 +107,106 @@ const requireSuperAdminRoute = (req, res, next) => {
   next();
 };
 
+/**
+ * Middleware para verificar se é super admin OU restaurant user (para rotas administrativas)
+ */
+const requireAdminAccess = (req, res, next) => {
+  if (!req.user) {
+    return res.status(403).send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Acesso Negado</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin-top: 50px; 
+            background: #f5f5f5;
+          }
+          .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: inline-block;
+          }
+          .error-code { font-size: 4rem; color: #FF5722; margin-bottom: 20px; }
+          h1 { color: #333; margin-bottom: 20px; }
+          p { color: #666; margin-bottom: 30px; }
+          .btn {
+            background: #FF5722;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="error-code">403</div>
+          <h1>Acesso Negado</h1>
+          <p>Você precisa fazer login para acessar esta página.</p>
+          <a href="/login" class="btn">Fazer Login</a>
+        </div>
+      </body>
+      </html>
+    `);
+  }
+
+  // Permitir tanto super_admin quanto restaurant_user
+  if (req.user.role === 'super_admin' || req.user.role === 'restaurant_user') {
+    return next();
+  }
+
+  return res.status(403).send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Acesso Negado</title>
+      <style>
+        body { 
+          font-family: Arial, sans-serif; 
+          text-align: center; 
+          margin-top: 50px; 
+          background: #f5f5f5;
+        }
+        .container {
+          background: white;
+          padding: 40px;
+          border-radius: 10px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          display: inline-block;
+        }
+        .error-code { font-size: 4rem; color: #FF5722; margin-bottom: 20px; }
+        h1 { color: #333; margin-bottom: 20px; }
+        p { color: #666; margin-bottom: 30px; }
+        .btn {
+          background: #FF5722;
+          color: white;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 5px;
+          display: inline-block;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="error-code">403</div>
+        <h1>Acesso Negado</h1>
+        <p>Você não tem permissão para acessar esta página.</p>
+        <a href="/login" class="btn">Fazer Login</a>
+      </div>
+    </body>
+    </html>
+  `);
+};
+
 module.exports = {
   protectRoute,
-  requireSuperAdminRoute
+  requireSuperAdminRoute,
+  requireAdminAccess
 };
