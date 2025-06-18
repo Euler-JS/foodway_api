@@ -1082,6 +1082,23 @@
             grid-template-columns: repeat(2, 1fr) !important;
         }
 
+        /* Loading indicator para stats */
+.stat-loading {
+    font-size: 1.5rem;
+    color: var(--black2);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Transições suaves para stats */
+.numbers {
+    transition: opacity 0.3s ease;
+}
     </style>
 </head>
 
@@ -1818,6 +1835,27 @@
         let userMenuTimeout = null;
         let allUsersData = [];
         let currentUserEditId = null;
+
+        // Cache simples para evitar requests desnecessários
+const statsCache = {
+    data: {},
+    timestamp: {},
+    ttl: 2 * 60 * 1000 // 2 minutos
+};
+
+function isCacheValid(key) {
+    return statsCache.timestamp[key] && 
+           (Date.now() - statsCache.timestamp[key]) < statsCache.ttl;
+}
+
+function setCacheData(key, data) {
+    statsCache.data[key] = data;
+    statsCache.timestamp[key] = Date.now();
+}
+
+function getCacheData(key) {
+    return isCacheValid(key) ? statsCache.data[key] : null;
+}
 
 
 
@@ -2790,6 +2828,165 @@ function setupUserFilters() {
         }
 
         // API Functions
+// Funções específicas para cada stat
+async function loadRestaurantStats() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/restaurants/stats`);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('restaurantCount').textContent = data.data?.active || 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar stats de restaurantes:', error);
+        document.getElementById('restaurantCount').textContent = '--';
+    }
+}
+
+async function loadCategoryStats() {
+    try {
+        let url = `${apiBaseUrl}/categories/stats`;
+        
+        // Filtrar por restaurante se for restaurant_user
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `?restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('categoryCount').textContent = data.data?.active || 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar stats de categorias:', error);
+        document.getElementById('categoryCount').textContent = '--';
+    }
+}
+
+async function loadProductStats() {
+    try {
+        let url = `${apiBaseUrl}/products/stats`;
+        
+        // Filtrar por restaurante se for restaurant_user
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `?restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('productCount').textContent = data.data?.available || 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar stats de produtos:', error);
+        document.getElementById('productCount').textContent = '--';
+    }
+}
+
+async function loadPromotionStats() {
+    try {
+        let url = `${apiBaseUrl}/products/promotions`;
+        
+        // Filtrar por restaurante se for restaurant_user  
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `?restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('promotionCount').textContent = data.data?.pagination?.total || 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar stats de promoções:', error);
+        document.getElementById('promotionCount').textContent = '--';
+    }
+}
+
+async function loadUserStats() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/users/stats`, {
+            headers: {
+                credentials: 'include'
+            }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            document.getElementById('userCount').textContent = data.data?.active_users || 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar stats de usuários:', error);
+        document.getElementById('userCount').textContent = '--';
+    }
+}
+
+// Mostrar/ocultar loading nos cards de stats
+function showStatsLoading(show) {
+    const statElements = [
+        'restaurantCount',
+        'categoryCount', 
+        'productCount',
+        'promotionCount',
+        'userCount'
+    ];
+    
+    statElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            if (show) {
+                element.innerHTML = '<div class="stat-loading">...</div>';
+                element.style.opacity = '0.6';
+            } else {
+                element.style.opacity = '1';
+            }
+        }
+    });
+}
+        // Carregar stats sem bloquear a UI
+
+// Carregar dados apenas quando necessário
+async function loadDataConditionally() {
+    // Restaurant users não precisam carregar lista de restaurantes
+    if (currentUser?.role === 'super_admin') {
+        await loadRestaurants();
+    }
+    
+    // Sempre carregar categorias (filtrado por role)
+    await loadCategories();
+    await loadCategoriesForProducts();
+}
+        async function loadStatsInBackground() {
+    try {
+        // Mostrar indicadores de carregamento nos cards
+        showStatsLoading(true);
+        
+        // Carregar stats de forma assíncrona e independente
+        const statsPromises = [
+            loadRestaurantStats(),
+            loadCategoryStats(), 
+            loadProductStats(),
+            loadPromotionStats()
+        ];
+        
+        // Se for super admin, carregar stats de usuários
+        if (currentUser?.role === 'super_admin') {
+            statsPromises.push(loadUserStats());
+        }
+        
+        // Executar todas em paralelo
+        await Promise.allSettled(statsPromises);
+        
+    } catch (error) {
+        console.error('Erro ao carregar estatísticas:', error);
+    } finally {
+        showStatsLoading(false);
+    }
+}
+
         async function loadStats() {
             try {
                 showLoading(true);
@@ -3197,7 +3394,8 @@ function setupUserFilters() {
 
         // Initialize everything
         // Initialize everything
-document.addEventListener('DOMContentLoaded', async () => {
+
+        document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Mostrar loading
         showInitialLoading(true);
@@ -3207,19 +3405,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupSearch();
         setupForms();
         
-        // IMPORTANTE: Carregar informações do usuário PRIMEIRO
+        // PRIMEIRO: Carregar usuário e mostrar interface básica
         await loadUserInfo();
-        
-        // Aplicar controles de acesso ANTES de carregar dados
         controlRoleBasedAccess();
         
-        // Agora carregar dados (já filtrados pelo role)
-        await loadStats();
-        await loadRestaurants();
-        await loadCategories();
-        await loadCategoriesForProducts();
+        // MOSTRAR DASHBOARD RAPIDAMENTE (sem aguardar stats)
+        setTimeout(() => {
+            showInitialLoading(false);
+        }, 500);
         
-        // Configurar filtros e formulários
+        // SEGUNDO: Carregar stats em background (sem bloquear UI)
+        loadStatsInBackground();
+        
+        // TERCEIRO: Carregar dados essenciais
+        await Promise.allSettled([
+            loadRestaurants(),
+            loadCategories(),
+            loadCategoriesForProducts()
+        ]);
+        
+        // Configurar componentes avançados
         setTimeout(() => {
             setupCategoryFilters();
             if (document.getElementById('productForm')) {
@@ -3228,41 +3433,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (document.getElementById('productSearch')) {
                 setupProductFilters();
             }
-            if (document.getElementById('userGrid')) {
+            if (document.getElementById('userGrid') && currentUser?.role === 'super_admin') {
                 loadUsers();
                 setupUserFilters();
                 setupUserForm();
             }
-        }, 500);
+        }, 100);
         
-        // Configurar auto-refresh
-        setInterval(async () => {
-            await loadStats();
+        // Auto-refresh otimizado
+        setInterval(() => {
+            loadStatsInBackground();
         }, 5 * 60 * 1000);
-        
-        // Configurar navegação para produtos
-        const productsNavItem = document.querySelector('[data-section="products"]');
-        if (productsNavItem) {
-            productsNavItem.addEventListener('click', () => {
-                setTimeout(loadProducts, 100);
-            });
-        }
         
     } catch (error) {
         console.error('Erro ao inicializar dashboard:', error);
         showError('Erro ao carregar dashboard. Recarregue a página.');
-    } finally {
-        // Ocultar loading após tudo carregar
-        setTimeout(() => {
-            showInitialLoading(false);
-        }, 800); // Pequeno delay para suavizar transição
+        showInitialLoading(false);
     }
     
-    // Configurar monitoramento de inatividade
     initInactivityMonitor();
     setupPasswordForm();
 });
-        //Categorias
+
+//Categorias
 
         // Categories functions
         async function loadCategories() {
