@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Manna Software</title>
+    <style>
+        :root {
+            --primary-color: #FF5722;
+            --secondary-color: #FF7043;
+            --light-color: #FFF3E0;
+            --dark-color: #333333;
+            --white: #FFFFFF;
+            --gray: #F5F5F5;
+            --error: #f44336;
+            --success: #4CAF50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .login-form {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn-login:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert.error {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(244, 67, 54, 0.2);
+        }
+
+        .alert.success {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .links {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .links a:hover {
+            color: var(--secondary-color);
+        }
+
+        .redirect-info {
+            background: var(--light-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 10px;
+            }
+            
+            .login-header {
+                padding: 20px;
+            }
+            
+            .login-form {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Manna Software</h1>
+            <p>Sistema de Gestão de Restaurantes</p>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <!-- Informação de redirecionamento -->
+            <div class="redirect-info" id="redirectInfo" style="display: none;">
+                <strong>Acesso Restrito:</strong> Você precisa fazer login para acessar esta página.
+            </div>
+
+            <!-- Alertas -->
+            <div class="alert error" id="errorAlert"></div>
+            <div class="alert success" id="successAlert"></div>
+            
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Fazendo login...</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required autocomplete="email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="btn-login" id="loginBtn">Entrar</button>
+            
+            <div class="links">
+                <a href="/start">← Voltar ao Início</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const apiBaseUrl = window.location.origin + '/api/v1';
+        
+        // Verificar parâmetros da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        const error = urlParams.get('error');
+        
+        // Mostrar informação de redirecionamento se existir
+        if (redirectUrl) {
+            document.getElementById('redirectInfo').style.display = 'block';
+        }
+        
+        // Mostrar erros específicos da URL
+        if (error) {
+            const errorMessages = {
+                'expired': 'Sua sessão expirou. Faça login novamente.',
+                'invalid': 'Token de acesso inválido. Faça login novamente.',
+                'inactive': 'Sua conta está inativa. Entre em contato com o administrador.',
+                'unauthorized': 'Acesso não autorizado. Faça login novamente.'
+            };
+            
+            const message = errorMessages[error] || 'Erro de autenticação. Faça login novamente.';
+            showError(message);
+        }
+        
+        // Verificar se já está logado
+        checkCurrentAuth();
+        
+        // Event listeners
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        
+        async function checkCurrentAuth() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/auth/status`);
+                const data = await response.json();
+                
+                if (data.success && data.data.authenticated) {
+                    // Já está logado, redirecionar
+                    const target = redirectUrl || '/dashboard';
+                    showSuccess('Você já está logado! Redirecionando...');
+                    setTimeout(() => {
+                        window.location.href = target;
+                    }, 1500);
+                }
+            } catch (error) {
+                console.log('Não autenticado');
+            }
+        }
+        
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showError('Email e senha são obrigatórios');
+                return;
+            }
+            
+            showLoading(true);
+            clearAlerts();
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include', // Importante para cookies
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                // console.log('Resposta do login:', data);
+                // return
+                
+                if (data.success) {
+                    // Login bem-sucedido
+                    showSuccess('Login realizado com sucesso! Redirecionando...');
+                    
+                    // Salvar informações do usuário no localStorage para acesso via JavaScript
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    localStorage.setItem('access_token', JSON.stringify(data.data.tokens.access_token));
+                    localStorage.setItem('refresh_token', JSON.stringify(data.data.tokens.refresh_token));
+                    
+                    // Redirecionar após um breve delay
+                    setTimeout(() => {
+                        const target = redirectUrl || '/dashboard';
+                        window.location.href = target;
+                    }, 1500);
+                    
+                } else {
+                    throw new Error(data.message || 'Erro no login');
+                }
+                
+            } catch (error) {
+                console.error('Erro no login:', error);
+                showError(error.message || 'Erro ao fazer login. Tente novamente.');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            
+            // Scroll para o topo
+            document.querySelector('.login-container').scrollTop = 0;
+        }
+        
+        function showSuccess(message) {
+            const successAlert = document.getElementById('successAlert');
+            successAlert.textContent = message;
+            successAlert.style.display = 'block';
+            
+            // Scroll para o topo
+            document.querySelector('.login-container').scrollTop = 0;
+        }
+        
+        function clearAlerts() {
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('successAlert').style.display = 'none';
+        }
+        
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const loginBtn = document.getElementById('loginBtn');
+            const form = document.getElementById('loginForm');
+            
+            if (show) {
+                loading.style.display = 'block';
+                loginBtn.disabled = true;
+                form.style.opacity = '0.7';
+            } else {
+                loading.style.display = 'none';
+                loginBtn.disabled = false;
+                form.style.opacity = '1';
+            }
+        }
+        
+        // Limpar parâmetros da URL após processar
+        if (window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.delete('error');
+            // Manter redirect para caso o usuário precise fazer login novamente
+            window.history.replaceState({}, document.title, url.toString());
+        }
+    </script>
+</body>
+</html>

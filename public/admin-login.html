@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Manna Software</title>
+    <style>
+        :root {
+            --primary-color: #FF5722;
+            --secondary-color: #FF7043;
+            --light-color: #FFF3E0;
+            --dark-color: #333333;
+            --white: #FFFFFF;
+            --gray: #F5F5F5;
+            --error-color: #f44336;
+            --success-color: #4CAF50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-color) 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .admin-login-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .admin-badge {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--dark-color);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            background: var(--gray);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+            background: var(--white);
+        }
+
+        .admin-login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-login-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 87, 34, 0.4);
+        }
+
+        .admin-login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .security-info {
+            background: var(--light-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--dark-color);
+            text-align: left;
+        }
+
+        .security-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .security-info ul {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+        .demo-credentials {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .demo-credentials h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .demo-credentials p {
+            margin: 5px 0;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .back-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .admin-login-container {
+                padding: 30px 20px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-login-container">
+        <div class="admin-badge">Acesso Administrativo</div>
+        <div class="logo">MannaSoftware</div>
+        <div class="subtitle">Painel de Administração</div>
+
+        <!-- Security Info -->
+        <div class="security-info">
+            <h4>🔒 Acesso Restrito</h4>
+            <ul>
+                <li>Apenas administradores autorizados</li>
+                <li>Todas as ações são registradas</li>
+                <li>Use credenciais seguras</li>
+            </ul>
+        </div>
+
+        <!-- Demo Credentials (remover em produção) -->
+        <div class="demo-credentials">
+            <h4>⚠️ Demonstração</h4>
+            <p><strong>Email:</strong> admin@mannasoftware.com</p>
+            <p><strong>Senha:</strong> admin123</p>
+        </div>
+
+        <!-- Alert Messages -->
+        <div class="alert" id="alertMessage"></div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Verificando credenciais...</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="email">Email Administrativo</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="admin-login-btn" id="loginBtn">
+                Acessar Sistema
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="/start">← Voltar para site público</a>
+        </div>
+    </div>
+
+    <script>
+        const apiBaseUrl = window.location.origin + '/api/v1';
+        
+        // Verificar se já está logado
+        checkAuthStatus();
+
+        // Preencher campos de demonstração
+        document.getElementById('email').value = 'admin@mannasoftware.com';
+        document.getElementById('password').value = 'admin123';
+
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleAdminLogin();
+        });
+
+        async function checkAuthStatus() {
+            try {
+                const token = localStorage.getItem('access_token');
+                if (!token) return;
+
+                const response = await fetch('/auth/check', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated && data.user.role === 'super_admin') {
+                        // Já está logado como admin, redirecionar
+                        window.location.href = '/dashboard';
+                    }
+                }
+            } catch (error) {
+                console.log('Não autenticado como admin');
+            }
+        }
+
+        async function handleAdminLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('loginBtn');
+            const loading = document.getElementById('loading');
+            const form = document.getElementById('adminLoginForm');
+
+            if (!email || !password) {
+                showAlert('Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+
+            try {
+                // Mostrar loading
+                showLoading(true);
+                submitBtn.disabled = true;
+                form.style.display = 'none';
+
+                const response = await fetch(`${apiBaseUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Verificar se é super admin
+                    if (data.data.user.role !== 'super_admin') {
+                        throw new Error('Acesso negado. Apenas super administradores podem acessar este painel.');
+                    }
+
+                    // Salvar tokens
+                    localStorage.setItem('access_token', data.data.tokens.access_token);
+                    localStorage.setItem('refresh_token', data.data.tokens.refresh_token);
+                    
+                    showAlert('Acesso autorizado! Redirecionando...', 'success');
+                    
+                    // Redirecionar após 1 segundo
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                    
+                } else {
+                    throw new Error(data.message || 'Credenciais inválidas');
+                }
+
+            } catch (error) {
+                showAlert(error.message || 'Erro ao acessar o sistema. Verifique suas credenciais.', 'error');
+                form.style.display = 'block';
+            } finally {
+                showLoading(false);
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alertMessage');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            loading.style.display = show ? 'block' : 'none';
+        }
+
+        // Adicionar listener para Enter nos campos
+        document.getElementById('email').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('password').focus();
+            }
+        });
+
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleAdminLogin();
+            }
+        });
+    </script>
+</body>
+</html>
