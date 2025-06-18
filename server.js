@@ -147,6 +147,9 @@ const productRoutes = require('./routes/products');
 const categoryProductRoutes = require('./routes/categoryProducts');
 const restaurantProductRoutes = require('./routes/restaurantProducts');
 const menuRoutes = require('./routes/menu');
+const tableRoutes = require('./routes/tables');
+const restaurantTableRoutes = require('./routes/restaurantTables');
+
 
 // Rotas de autenticação e usuários (novas)
 app.use('/api/v1/auth', authRoutes);
@@ -160,6 +163,10 @@ app.use('/api/v1/restaurants/:restaurant_id/categories', restaurantCategoryRoute
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/categories/:category_id/products', categoryProductRoutes);
 app.use('/api/v1/restaurants/:restaurant_id/products', restaurantProductRoutes);
+
+// Rotas de mesas
+app.use('/api/v1/tables', tableRoutes);
+app.use('/api/v1/restaurants/:restaurant_id/tables', restaurantTableRoutes);
 
 // Rota de menu (pública para visualização)
 app.use('/api/v1/menu', menuRoutes);
