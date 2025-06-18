@@ -1022,10 +1022,76 @@
     font-style: italic;
 }
 
+/* Loading screen inicial */
+.initial-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--white);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.initial-loading .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.initial-loading h3 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.initial-loading p {
+    color: var(--black2);
+}
+
+/* Ocultar conteúdo até carregar */
+.main.loading {
+    visibility: hidden;
+}
+
+/* ============ Controle de visibilidade por role ============ */
+        /* Ocultar elementos por role via CSS para evitar flash */
+        body[data-user-role="restaurant_user"] .nav-item[data-section="users"],
+        body[data-user-role="restaurant_user"] .nav-item[data-section="restaurants"],
+        body[data-user-role="restaurant_user"] .nav-item[data-section="menu"],
+        body[data-user-role="restaurant_user"] .nav-item[data-section="api"],
+        body[data-user-role="restaurant_user"] a[onclick*="health"] {
+            display: none !important;
+        }
+
+        /* Ocultar cards específicos para restaurant_user */
+        body[data-user-role="restaurant_user"] #restaurantCount,
+        body[data-user-role="restaurant_user"] #userCount {
+            display: none !important;
+        }
+
+        /* Ajustar grid de cards para restaurant_user */
+        body[data-user-role="restaurant_user"] .cardBox {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+
     </style>
 </head>
 
 <body>
+    <!-- Loading screen inicial -->
+<div class="initial-loading" id="initialLoading">
+    <div class="spinner"></div>
+    <h3>Carregando Dados...</h3>
+    <p>Preparando sua área de trabalho</p>
+</div>
     <!-- =============== Navigation ================ -->
     <div class="container">
         <div class="navigation">
@@ -1134,7 +1200,7 @@
         </div>
 
         <!-- ========================= Main ==================== -->
-        <div class="main">
+        <div class="main loading">
             <div class="topbar">
                 <div class="toggle">
                     <ion-icon name="menu-outline"></ion-icon>
@@ -1767,6 +1833,28 @@ function toggleUserMenu() {
     }
 }
 
+// Controlar loading screen inicial
+function showInitialLoading(show) {
+    const loadingScreen = document.getElementById('initialLoading');
+    const mainContent = document.querySelector('.main');
+    
+    if (show) {
+        if (loadingScreen) loadingScreen.style.display = 'flex';
+        if (mainContent) mainContent.classList.add('loading');
+    } else {
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 300);
+        }
+        if (mainContent) {
+            mainContent.classList.remove('loading');
+            mainContent.style.visibility = 'visible';
+        }
+    }
+}
+
 function openUserMenu() {
     const userMenu = document.querySelector('.user-menu');
     userMenu.classList.add('active');
@@ -1804,14 +1892,19 @@ async function loadUserInfo() {
             if (data.success) {
                 currentUser = data.data;
                 updateUserDisplay();
+                return true;
             }
         } else if (response.status === 401) {
             // Token inválido, redirecionar para login
             redirectToLogin();
+            return false;
         }
     } catch (error) {
         console.error('Erro ao carregar informações do usuário:', error);
+        redirectToLogin();
+        return false;
     }
+    return false;
 }
 
 function updateUserDisplay() {
@@ -1833,10 +1926,14 @@ function updateUserDisplay() {
 
 // Função para controlar visibilidade baseada no role
 function controlRoleBasedAccess() {
-    if (!currentUser) return;
+    if (!currentUser) {
+        console.warn('Usuário não carregado ainda');
+        return;
+    }
     
     const isRestaurantUser = currentUser.role === 'restaurant_user';
     
+    document.body.setAttribute('data-user-role', currentUser.role);
     if (isRestaurantUser) {
         // 1. Ocultar cards do dashboard
         const restaurantCard = document.getElementById('restaurantCount')?.closest('.card');
@@ -2712,14 +2809,21 @@ function setupUserFilters() {
                 const responsePromotions = await fetch(`${apiBaseUrl}/products/promotions`);
                 const dataPromotions = await responsePromotions.json();
 
-                const responseUsers = await fetch(`${apiBaseUrl}/users/stats`, {
+                if(currentUser?.role === 'super_admin'){
+                    const responseUsers = await fetch(`${apiBaseUrl}/users/stats`, {
                     headers: {
                         credentials: 'include'
                         // 'Authorization': `Bearer ${token}`,
                         // 'Content-Type': 'application/json'
                     }
-                });
-                const dataUsers = await responseUsers.json();
+                    });
+                    const dataUsers = await responseUsers.json();
+
+                     if (dataUsers.success) {
+                    document.getElementById('userCount').textContent = dataUsers.data?.active_users || 0;
+                }
+                } 
+                
 
                 if (data.success) {
                     document.getElementById('restaurantCount').textContent = data.data?.active || 0;
@@ -2739,9 +2843,7 @@ function setupUserFilters() {
                         document.getElementById('promotionCount').textContent = dataPromotions.data?.pagination?.total || 0;
                 }
 
-                if (dataUsers.success) {
-                    document.getElementById('userCount').textContent = dataUsers.data?.active_users || 0;
-                }
+               
             } catch (error) {
                 showError('Erro ao carregar estatísticas: ' + error.message);
             } finally {
@@ -3094,62 +3196,72 @@ function setupUserFilters() {
         }
 
         // Initialize everything
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadUserInfo();
-            controlRoleBasedAccess();
-            
-            initNavigation();
-            setupSearch();
-            setupForms();
-            // setupProductForm();
-
-            initInactivityMonitor();
-            
-            // Configurar formulários
-            setupPasswordForm();
-            
-            // Load initial data
-            await loadStats();
-            await loadRestaurants();
-            await loadCategories();
-            await loadCategoriesForProducts();
-            // await loadUsers();
-
-            // Carregar utilizadores
+        // Initialize everything
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Mostrar loading
+        showInitialLoading(true);
+        
+        // Configurar componentes básicos
+        initNavigation();
+        setupSearch();
+        setupForms();
+        
+        // IMPORTANTE: Carregar informações do usuário PRIMEIRO
+        await loadUserInfo();
+        
+        // Aplicar controles de acesso ANTES de carregar dados
+        controlRoleBasedAccess();
+        
+        // Agora carregar dados (já filtrados pelo role)
+        await loadStats();
+        await loadRestaurants();
+        await loadCategories();
+        await loadCategoriesForProducts();
+        
+        // Configurar filtros e formulários
+        setTimeout(() => {
+            setupCategoryFilters();
+            if (document.getElementById('productForm')) {
+                setupProductForm();
+            }
+            if (document.getElementById('productSearch')) {
+                setupProductFilters();
+            }
             if (document.getElementById('userGrid')) {
-                await loadUsers();
+                loadUsers();
                 setupUserFilters();
                 setupUserForm();
             }
-
-            setTimeout(setupCategoryFilters, 500);
-            
-            // Auto-refresh every 5 minutes
-            setInterval(async () => {
-                await loadStats();
-            }, 5 * 60 * 1000);
-
-            setTimeout(() => {
-        // Configurar formulários
-        if (document.getElementById('productForm')) {
-            setupProductForm();
-        }
+        }, 500);
         
-        // Configurar filtros
-        if (document.getElementById('productSearch')) {
-            setupProductFilters();
-        }
+        // Configurar auto-refresh
+        setInterval(async () => {
+            await loadStats();
+        }, 5 * 60 * 1000);
         
-        // Configurar navegação para carregar produtos
+        // Configurar navegação para produtos
         const productsNavItem = document.querySelector('[data-section="products"]');
         if (productsNavItem) {
             productsNavItem.addEventListener('click', () => {
                 setTimeout(loadProducts, 100);
             });
         }
-    }, 1000);
-        });
-
+        
+    } catch (error) {
+        console.error('Erro ao inicializar dashboard:', error);
+        showError('Erro ao carregar dashboard. Recarregue a página.');
+    } finally {
+        // Ocultar loading após tudo carregar
+        setTimeout(() => {
+            showInitialLoading(false);
+        }, 800); // Pequeno delay para suavizar transição
+    }
+    
+    // Configurar monitoramento de inatividade
+    initInactivityMonitor();
+    setupPasswordForm();
+});
         //Categorias
 
         // Categories functions
