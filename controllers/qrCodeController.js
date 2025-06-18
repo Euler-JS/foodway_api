@@ -18,8 +18,9 @@ class QRCodeController {
       const restaurant = await Restaurant.findById(restaurant_id);
       
       // Construir URL do menu
-      const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
-      const menuUrl = `${baseUrl}/menu/restaurant/${restaurant.uuid}`;
+      // const baseUrl = process.env.WEBAPP_URL || req.protocol + '://' + req.get('host');
+      const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
+      const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}`;
 
       // Opções do QR Code
       const qrOptions = {
@@ -81,8 +82,9 @@ class QRCodeController {
       const table = await Table.findByRestaurantAndNumber(restaurant_id, parseInt(table_number));
 
       // Construir URL do menu com mesa
-      const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
-      const menuUrl = `${baseUrl}/menu/restaurant/${restaurant.uuid}/table/${table.table_number}`;
+      // const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
+      const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
+      const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}?table=${table.table_number}`;
 
       // Opções do QR Code
       const qrOptions = {
@@ -160,7 +162,8 @@ class QRCodeController {
       // Verificar se o restaurante existe
       const restaurant = await Restaurant.findById(restaurant_id);
       
-      const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
+      // const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
+      const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
       const qrResults = [];
 
       // Opções do QR Code
@@ -182,7 +185,7 @@ class QRCodeController {
           const table = await Table.findByRestaurantAndNumber(restaurant_id, tableNumber);
           
           // Construir URL
-          const menuUrl = `${baseUrl}/menu/restaurant/${restaurant.uuid}/table/${table.table_number}`;
+          const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}?table=${table.table_number}`;
           
           // Gerar QR Code
           const dataUrl = await QRCode.toDataURL(menuUrl, qrOptions);
@@ -275,7 +278,8 @@ class QRCodeController {
       }
 
       // Gerar HTML para impressão
-      const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
+      // const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
+      const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
       
       const qrOptions = {
         type: 'svg',
@@ -290,7 +294,7 @@ class QRCodeController {
       let qrCodesHtml = '';
       
       for (const table of tablesToPrint) {
-        const menuUrl = `${baseUrl}/menu/restaurant/${restaurant.uuid}/table/${table.table_number}`;
+        const menuUrl = `${baseUrl}/?restaurant=${restaurant.uuid}?table=${table.table_number}`;
         const qrSvg = await QRCode.toString(menuUrl, qrOptions);
         
         qrCodesHtml += `
@@ -301,7 +305,7 @@ class QRCodeController {
               <p>${restaurant.name}</p>
               ${table.name ? `<p class="table-name">${table.name}</p>` : ''}
               <p class="capacity">${table.capacity} pessoas</p>
-              <p class="url">${menuUrl}</p>
+              <!--<p class="url">${menuUrl}</p>-->
             </div>
           </div>
         `;
@@ -459,7 +463,8 @@ class QRCodeController {
       const tablesWithQR = allTables.filter(table => table.qr_code_generated);
       const tablesWithoutQR = allTables.filter(table => !table.qr_code_generated);
 
-      const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
+      // const baseUrl = process.env.APP_URL || req.protocol + '://' + req.get('host');
+      const baseUrl = process.env.WEBAPP_URL || "https://euler-js.github.io/foodway";
 
       return ApiResponse.success(res, {
         restaurant: {
