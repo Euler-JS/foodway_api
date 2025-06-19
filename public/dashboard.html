@@ -4300,7 +4300,7 @@ function initTablesSection() {
                 
                 if (data.success) {
                     showSuccess(currentEditId ? 'Restaurante atualizado com sucesso!' : 'Restaurante criado com sucesso!');
-                    closeModal();
+                    closeModal('restaurant');
                     await loadRestaurants();
                     await loadStats();
                 } else {
