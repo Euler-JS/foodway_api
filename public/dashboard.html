@@ -4193,7 +4193,7 @@ function initTablesSection() {
         function openModal(type, data = null) {
             
             
-            if (type === 'restaurant' && currentUser?.role === 'restaurant_user') {
+            if (type === 'restaurant' && currentUser?.role === 'super_admin') {
                 const modal = document.getElementById('restaurantModal');
                 const title = document.getElementById('modalTitle');
                 const form = document.getElementById('restaurantForm');
