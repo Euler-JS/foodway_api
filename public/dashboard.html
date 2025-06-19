@@ -3564,6 +3564,23 @@ function openUserModal(data = null) {
     
     currentUserEditId = data ? data.id : null;
     title.textContent = data ? 'Editar Utilizador' : 'Novo Utilizador';
+
+    const userRolesData = [
+        { value: 'super_admin', text: 'Super Administrador' },
+        { value: 'restaurant_user', text: 'Utilizador do Restaurante' }
+    ];
+
+    // Popular select de FUNÇÕES - MESMA LÓGICA DOS RESTAURANTES
+    const roleSelect = document.getElementById('userRole');
+    roleSelect.innerHTML = '<option value="">Selecione uma função</option>';
+    if (userRolesData && userRolesData.length > 0) {
+        userRolesData.forEach(role => {
+            const option = document.createElement('option');
+            option.value = role.value;
+            option.textContent = role.text;
+            roleSelect.appendChild(option);
+        });
+    }
     
     // Popular select de restaurantes
     const restaurantSelect = document.getElementById('userRestaurant');
