@@ -118,23 +118,24 @@ app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
 
 // Rota raiz
 app.get('/', (req, res) => {
-  res.json({
-    message: 'Restaurant Menu API with User Management',
-    version: process.env.API_VERSION || 'v1',
-    documentation: '/api/docs',
-    health: '/health',
-    admin: '/admin',
-    login: '/login',
-    start: '/start',
-    endpoints: {
-      auth: '/api/v1/auth',
-      users: '/api/v1/users',
-      restaurants: '/api/v1/restaurants',
-      categories: '/api/v1/categories',
-      products: '/api/v1/products',
-      menu: '/api/v1/menu'
-    }
-  });
+  // res.json({
+  //   message: 'Restaurant Menu API with User Management',
+  //   version: process.env.API_VERSION || 'v1',
+  //   documentation: '/api/docs',
+  //   health: '/health',
+  //   admin: '/admin',
+  //   login: '/login',
+  //   start: '/start',
+  //   endpoints: {
+  //     auth: '/api/v1/auth',
+  //     users: '/api/v1/users',
+  //     restaurants: '/api/v1/restaurants',
+  //     categories: '/api/v1/categories',
+  //     products: '/api/v1/products',
+  //     menu: '/api/v1/menu'
+  //   }
+  // });
+  res.redirect('/start');
 });
 
 // Importar e usar rotas
