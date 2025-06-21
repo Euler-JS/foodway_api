@@ -1566,7 +1566,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item" data-section="dashboard">
+                <li class="nav-item" data-section="dashboard" onclick="loadStatsInBackground();">
                     <a href="#">
                         <span class="icon">
                             <ion-icon name="home-outline"></ion-icon>
@@ -4023,6 +4023,7 @@
 
                 // Show corresponding section
                 const section = this.getAttribute('data-section');
+                console.log("Section ", section);
                 showSection(section);
             }
 
@@ -4061,7 +4062,7 @@
             }
              else if (sectionName === 'tables') {
                 loadTables();
-            }
+            } 
         }
 
         // API Functions
@@ -4124,7 +4125,7 @@
 
         async function loadPromotionStats() {
             try {
-                let url = `${apiBaseUrl}/products/promotions`;
+                let url = `${apiBaseUrl}/products/stats`;
 
                 // Filtrar por restaurante se for restaurant_user  
                 if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
@@ -4135,7 +4136,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    document.getElementById('promotionCount').textContent = data.data?.pagination?.total || 0;
+                    document.getElementById('promotionCount').textContent = data.data?.on_promotion || 0;
                 }
             } catch (error) {
                 console.error('Erro ao carregar stats de promoções:', error);
