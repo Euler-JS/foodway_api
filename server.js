@@ -112,6 +112,10 @@ app.get('/dashboard', protectRoute, requireAdminAccess, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+app.get('/order', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'order.html'));
+});
+
 app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
   res.status(204).end();
 });
@@ -151,6 +155,8 @@ const restaurantProductRoutes = require('./routes/restaurantProducts');
 const menuRoutes = require('./routes/menu');
 const tableRoutes = require('./routes/tables');
 const restaurantTableRoutes = require('./routes/restaurantTables');
+const orderRoutes = require('./routes/orders');
+const restaurantOrderRoutes = require('./routes/restaurantOrders');
 
 
 // Rotas de autenticação e usuários (novas)
@@ -171,6 +177,9 @@ app.use('/api/v1/tables', tableRoutes);
 app.use('/api/v1/restaurants/:restaurant_id/tables', restaurantTableRoutes);
 
 app.use('/api/v1/qr', qrCodeRoutes);
+
+app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/restaurants/:restaurant_id/orders', restaurantOrderRoutes);
 
 // Rota de menu (pública para visualização)
 app.use('/api/v1/menu', menuRoutes);

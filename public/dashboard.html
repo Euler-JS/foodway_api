@@ -1566,12 +1566,21 @@
                     </a>
                 </li>
 
-                <li class="nav-item" data-section="dashboard">
+                <li class="nav-item hovered" data-section="dashboard" onclick="loadStatsInBackground();">
                     <a href="#">
                         <span class="icon">
                             <ion-icon name="home-outline"></ion-icon>
                         </span>
                         <span class="title">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" data-section="orders">
+                    <a href="#">
+                        <span class="icon">
+                            <ion-icon name="receipt-outline"></ion-icon>
+                        </span>
+                        <span class="title">Pedidos</span>
                     </a>
                 </li>
 
@@ -1714,6 +1723,16 @@
 
                     <div class="card">
                         <div>
+                            <div class="numbers" id="orderCount">0</div>
+                            <div class="cardName">Pedidos Hoje</div>
+                        </div>
+                        <div class="iconBx">
+                            <ion-icon name="receipt-outline"></ion-icon>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div>
                             <div class="numbers" id="categoryCount">0</div>
                             <div class="cardName">Categorias</div>
                         </div>
@@ -1830,6 +1849,86 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ======================= Orders Section ================== -->
+             <div class="content-section" id="orders">
+    <div style="padding: 20px;">
+        <div class="cardHeader" style="margin-bottom: 30px;">
+            <h2>Gestão de Pedidos</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="showKitchenView()">
+                    <ion-icon name="restaurant-outline" style="margin-right: 8px;"></ion-icon>
+                    Visão Cozinha
+                </button>
+                <button class="btn-secondary" onclick="refreshOrders()">
+                    <ion-icon name="refresh-outline" style="margin-right: 8px;"></ion-icon>
+                    Atualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="order-status-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            <div class="status-card pending">
+                <div class="status-number" id="pendingCount">0</div>
+                <div class="status-label">Pendentes</div>
+            </div>
+            <div class="status-card confirmed">
+                <div class="status-number" id="confirmedCount">0</div>
+                <div class="status-label">Confirmados</div>
+            </div>
+            <div class="status-card preparing">
+                <div class="status-number" id="preparingCount">0</div>
+                <div class="status-label">Preparando</div>
+            </div>
+            <div class="status-card ready">
+                <div class="status-number" id="readyCount">0</div>
+                <div class="status-label">Prontos</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-bar" style="background: var(--white); padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <select id="orderStatusFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todos</option>
+                        <option value="pending">Pendente</option>
+                        <option value="confirmed">Confirmado</option>
+                        <option value="preparing">Preparando</option>
+                        <option value="ready">Pronto</option>
+                        <option value="delivered">Entregue</option>
+                        <option value="cancelled">Cancelado</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Mesa:</label>
+                    <select id="orderTableFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Período:</label>
+                    <select id="orderPeriodFilter" style="padding: 8px 12px; border: 1px solid var(--black2); border-radius: 5px;">
+                        <option value="today">Hoje</option>
+                        <option value="week">Esta Semana</option>
+                        <option value="month">Este Mês</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="clearOrderFilters()" style="padding: 8px 15px;">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    Limpar
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de Pedidos -->
+        <div class="orders-container" id="ordersContainer">
+            <!-- Orders will be loaded here -->
+        </div>
+    </div>
+</div>
 
             <!-- ======================= Other Sections ================== -->
             <!-- No dashboard.html, atualize a seção de categorias para incluir filtros -->
@@ -2750,6 +2849,8 @@
         let currentProductPage = 1;
         let totalProductPages = 1;
         let productPagination = null;
+        let allOrdersData = [];
+        let orderStats = {};
 
         // Cache simples para evitar requests desnecessários
         const statsCache = {
@@ -3922,6 +4023,7 @@
 
                 // Show corresponding section
                 const section = this.getAttribute('data-section');
+                console.log("Section ", section);
                 showSection(section);
             }
 
@@ -3955,9 +4057,12 @@
                 loadCategories();
             } else if (sectionName === 'products') {
                 loadProducts();
-            } else if (sectionName === 'tables') {
-                loadTables();
+            } else if (sectionName === 'orders') {
+                loadOrders();
             }
+             else if (sectionName === 'tables') {
+                loadTables();
+            } 
         }
 
         // API Functions
@@ -4020,7 +4125,7 @@
 
         async function loadPromotionStats() {
             try {
-                let url = `${apiBaseUrl}/products/promotions`;
+                let url = `${apiBaseUrl}/products/stats`;
 
                 // Filtrar por restaurante se for restaurant_user  
                 if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
@@ -4031,7 +4136,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    document.getElementById('promotionCount').textContent = data.data?.pagination?.total || 0;
+                    document.getElementById('promotionCount').textContent = data.data?.on_promotion || 0;
                 }
             } catch (error) {
                 console.error('Erro ao carregar stats de promoções:', error);
@@ -4103,7 +4208,8 @@
                     loadCategoryStats(),
                     loadProductStats(),
                     loadPromotionStats(),
-                    loadTableStats() // Carregar stats de mesas
+                    loadTableStats(), // Carregar stats de mesas
+                    loadOrderStats()// Carregar estatísticas de pedidos
                 ];
 
                 // Se for super admin, carregar stats de usuários
@@ -4139,6 +4245,8 @@
                 // Carregar produtos em promoção
                 const responsePromotions = await fetch(`${apiBaseUrl}/products/promotions`);
                 const dataPromotions = await responsePromotions.json();
+
+                
 
                 if (currentUser?.role === 'super_admin') {
                     const responseUsers = await fetch(`${apiBaseUrl}/users/stats`, {
@@ -4224,6 +4332,8 @@
             if (document.getElementById('tables').classList.contains('active')) {
                 loadTables();
             }
+
+            startOrderAutoRefresh();
         }
 
         async function loadRestaurants() {
@@ -5247,6 +5357,10 @@
 
         // Aplicar filtros ativos
         const filters = getCurrentProductFilters();
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            delete filters.restaurant_id;
+        }
+        
         Object.keys(filters).forEach(key => {
             if (filters[key] !== null && filters[key] !== '') {
                 url += `&${key}=${encodeURIComponent(filters[key])}`;
@@ -5311,15 +5425,20 @@
     }
 }
         // Função para capturar filtros atuais
-        function getCurrentProductFilters() {
-            return {
-                search: document.getElementById('productSearch')?.value.trim() || null,
-                category_id: document.getElementById('productCategoryFilter')?.value || null,
-                restaurant_id: document.getElementById('productRestaurantFilter')?.value || null,
-                is_available: document.getElementById('productStatusFilter')?.value || null,
-                is_on_promotion: document.getElementById('productPromotionFilter')?.value || null
-            };
-        }
+      function getCurrentProductFilters() {
+    const restaurantId = document.getElementById('productRestaurantFilter')?.value;
+    const categoryId = document.getElementById('productCategoryFilter')?.value;
+
+    console.log('🔍 Capturando filtros de produtos:', restaurantId, categoryId);
+    
+    return {
+        search: document.getElementById('productSearch')?.value.trim() || null,
+        category_id: categoryId && categoryId !== '' ? parseInt(categoryId) : null,
+        restaurant_id: restaurantId && restaurantId !== '' ? parseInt(restaurantId) : null,
+        is_available: document.getElementById('productStatusFilter')?.value || null,
+        is_on_promotion: document.getElementById('productPromotionFilter')?.value || null
+    };
+}
 
 
 
@@ -6845,6 +6964,283 @@ function loadNextProductPage() {
         currentProductPage++;
         loadProducts(currentProductPage);
     }
+}
+
+// Carregar pedidos
+async function loadOrders() {
+    try {
+        showLoading(true);
+        let url = `${apiBaseUrl}/orders?limit=50`;
+
+        // Filtrar por restaurante se for restaurant_user
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
+        }
+
+        // Aplicar filtros
+        const filters = getCurrentOrderFilters();
+        Object.keys(filters).forEach(key => {
+            if (filters[key] !== null && filters[key] !== '') {
+                url += `&${key}=${encodeURIComponent(filters[key])}`;
+            }
+        });
+
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            allOrdersData = data.data.data || [];
+            displayOrders(allOrdersData);
+            await loadOrderStats();
+        }
+    } catch (error) {
+        showError('Erro ao carregar pedidos: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Exibir pedidos
+function displayOrders(orders) {
+    const container = document.getElementById('ordersContainer');
+
+    if (!orders || orders.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <ion-icon name="receipt-outline" style="font-size: 4rem; color: var(--black2); margin-bottom: 20px;"></ion-icon>
+                <h3 style="color: var(--black2); margin-bottom: 10px;">Nenhum pedido encontrado</h3>
+                <p style="color: var(--black2);">Os pedidos aparecerão aqui quando criados</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="orders-grid">
+            ${orders.map(order => createOrderCard(order)).join('')}
+        </div>
+    `;
+}
+
+// Criar card de pedido
+function createOrderCard(order) {
+    const statusColors = {
+        pending: '#FF9800',
+        confirmed: '#2196F3', 
+        preparing: '#FF5722',
+        ready: '#4CAF50',
+        delivered: '#9C27B0',
+        cancelled: '#f44336'
+    };
+
+    const statusLabels = {
+        pending: 'Pendente',
+        confirmed: 'Confirmado',
+        preparing: 'Preparando', 
+        ready: 'Pronto',
+        delivered: 'Entregue',
+        cancelled: 'Cancelado'
+    };
+
+    const canProgress = {
+        pending: 'confirmed',
+        confirmed: 'preparing',
+        preparing: 'ready',
+        ready: 'delivered'
+    };
+
+    return `
+        <div class="order-card" style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px;">
+            <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div>
+                    <h3 style="color: var(--primary-color); margin: 0;">#${order.order_number}</h3>
+                    <p style="margin: 5px 0; color: var(--black2);">
+                        <ion-icon name="time-outline"></ion-icon> 
+                        ${formatDateTime(order.created_at)}
+                    </p>
+                    ${order.table ? `<p style="margin: 5px 0; color: var(--black2);"><ion-icon name="grid-outline"></ion-icon> Mesa ${order.table.table_number}</p>` : ''}
+                </div>
+                <div style="text-align: right;">
+                    <div class="order-status" style="background: ${statusColors[order.status]}; color: white; padding: 5px 12px; border-radius: 15px; font-size: 0.9rem; font-weight: 600; margin-bottom: 10px;">
+                        ${statusLabels[order.status]}
+                    </div>
+                    <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">
+                        ${formatPrice(order.total_amount)} MT
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-customer" style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                ${order.customer_name ? `<p><strong>Cliente:</strong> ${order.customer_name}</p>` : ''}
+                ${order.customer_phone ? `<p><strong>Telefone:</strong> ${order.customer_phone}</p>` : ''}
+                ${order.notes ? `<p><strong>Observações:</strong> ${order.notes}</p>` : ''}
+            </div>
+
+            <div class="order-items" style="margin-bottom: 15px;">
+                <h4 style="margin-bottom: 10px; color: var(--dark-color);">Itens (${order.items?.length || 0}):</h4>
+                ${order.items?.map(item => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #eee;">
+                        <div>
+                            <strong>${item.product?.name || 'Produto não encontrado'}</strong>
+                            ${item.notes ? `<br><small style="color: var(--black2);">${item.notes}</small>` : ''}
+                        </div>
+                        <div style="text-align: right;">
+                            <span>${item.quantity}x</span>
+                            <span style="margin-left: 10px; font-weight: 600;">${formatPrice(item.total_price)} MT</span>
+                        </div>
+                    </div>
+                `).join('') || '<p>Nenhum item encontrado</p>'}
+            </div>
+
+            <div class="order-actions" style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn-sm btn-secondary" onclick="viewOrderDetails(${order.id})" title="Ver Detalhes">
+                    <ion-icon name="eye-outline"></ion-icon>
+                </button>
+                
+                ${canProgress[order.status] ? `
+                    <button class="btn-sm btn-success" onclick="updateOrderStatus(${order.id}, '${canProgress[order.status]}')" title="Avançar Status">
+                        <ion-icon name="arrow-forward-outline"></ion-icon>
+                    </button>
+                ` : ''}
+                
+                ${order.status !== 'cancelled' && order.status !== 'delivered' ? `
+                    <button class="btn-sm btn-delete" onclick="cancelOrder(${order.id})" title="Cancelar">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// Carregar estatísticas de pedidos
+async function loadOrderStats() {
+    try {
+        let url = `${apiBaseUrl}/orders/stats?period=today`;
+        
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
+        }
+
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            orderStats = data.data;
+            updateOrderStatsDisplay();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar stats de pedidos:', error);
+    }
+}
+
+// Atualizar exibição das estatísticas
+function updateOrderStatsDisplay() {
+    document.getElementById('orderCount').textContent = orderStats.total_orders || 0;
+    document.getElementById('pendingCount').textContent = orderStats.pending || 0;
+    document.getElementById('confirmedCount').textContent = orderStats.confirmed || 0;
+    document.getElementById('preparingCount').textContent = orderStats.preparing || 0;
+    document.getElementById('readyCount').textContent = orderStats.ready || 0;
+}
+
+// Atualizar status do pedido
+async function updateOrderStatus(orderId, newStatus) {
+    try {
+        showLoading(true);
+
+        const response = await fetch(`${apiBaseUrl}/orders/${orderId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                credentials: 'include'
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showSuccess('Status atualizado com sucesso!');
+            await loadOrders();
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        showError('Erro ao atualizar status: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Cancelar pedido
+async function cancelOrder(orderId) {
+    if (!confirm('Tem certeza que deseja cancelar este pedido?')) return;
+    
+    await updateOrderStatus(orderId, 'cancelled');
+}
+
+// Ver detalhes do pedido
+function viewOrderDetails(orderId) {
+    // Implementar modal de detalhes
+    alert(`Ver detalhes do pedido ${orderId} - Implementar modal`);
+}
+
+// Visão da cozinha
+async function showKitchenView() {
+    try {
+        let url = `${apiBaseUrl}/orders/kitchen`;
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            // Mostrar apenas pedidos confirmados e em preparo
+            displayOrders(data.data);
+            showSuccess('Visão da cozinha carregada');
+        }
+    } catch (error) {
+        showError('Erro ao carregar visão da cozinha: ' + error.message);
+    }
+}
+
+// Atualizar automaticamente
+function startOrderAutoRefresh() {
+    // setInterval(async () => {
+    //     if (document.getElementById('orders').classList.contains('active')) {
+    //         await loadOrders();
+    //     }
+    // }, 30000); // 30 segundos
+}
+
+// Filtros e utilitários
+function getCurrentOrderFilters() {
+    return {
+        status: document.getElementById('orderStatusFilter')?.value || null,
+        table_id: document.getElementById('orderTableFilter')?.value || null,
+        period: document.getElementById('orderPeriodFilter')?.value || 'today'
+    };
+}
+
+function clearOrderFilters() {
+    document.getElementById('orderStatusFilter').value = '';
+    document.getElementById('orderTableFilter').value = '';
+    document.getElementById('orderPeriodFilter').value = 'today';
+    loadOrders();
+}
+
+function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('pt-BR');
+}
+
+function refreshOrders() {
+    loadOrders();
 }
 
     </script>
