@@ -3241,9 +3241,22 @@
                         Produtos Disponíveis
                     </div>
                     <div class="products-filter">
-                        <select id="newOrderCategoryFilter" onchange="filterOrderProducts()">
-                            <option value="">📋 Todas as categorias</option>
-                        </select>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="flex: 1;">
+                                <input 
+                                    type="text" 
+                                    id="newOrderSearchInput" 
+                                    placeholder="🔍 Buscar produto..." 
+                                    style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;"
+                                    oninput="filterOrderProducts()"
+                                >
+                            </div>
+                            <div style="flex: 1;">
+                                <select id="newOrderCategoryFilter" onchange="filterOrderProducts()" style="width: 100%;">
+                                    <option value="">📋 Todas as categorias</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="products-list" id="newOrderProductsList">
                         <!-- Produtos serão carregados aqui -->
@@ -7775,6 +7788,7 @@ async function openNewOrderModal() {
         document.getElementById('newOrderCustomerEmail').value = '';
         document.getElementById('newOrderTable').value = '';
         document.getElementById('newOrderNotes').value = '';
+        document.getElementById('newOrderSearchInput').value = '';
         
         // Mostrar modal
         document.getElementById('newOrderModal').style.display = 'block';
@@ -7884,7 +7898,7 @@ async function loadNewOrderTables() {
     }
 }
 
-// Filtrar produtos por categoria
+// Filtrar produtos por categoria e busca
 function filterOrderProducts() {
     displayNewOrderProducts();
 }
@@ -7893,17 +7907,37 @@ function filterOrderProducts() {
 function displayNewOrderProducts() {
     const container = document.getElementById('newOrderProductsList');
     const categoryFilter = document.getElementById('newOrderCategoryFilter').value;
+    const searchTerm = document.getElementById('newOrderSearchInput')?.value.toLowerCase() || '';
     
     let filteredProducts = newOrderProducts;
     
+    // Filtro por categoria
     if (categoryFilter) {
-        filteredProducts = newOrderProducts.filter(product => 
+        filteredProducts = filteredProducts.filter(product => 
             product.category_id.toString() === categoryFilter
         );
     }
     
+    // Filtro por busca de texto
+    if (searchTerm) {
+        filteredProducts = filteredProducts.filter(product => 
+            product.name.toLowerCase().includes(searchTerm) ||
+            (product.description && product.description.toLowerCase().includes(searchTerm))
+        );
+    }
+    
     if (filteredProducts.length === 0) {
-        container.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">Nenhum produto encontrado</p>';
+        const emptyMessage = searchTerm 
+            ? `Nenhum produto encontrado para "${searchTerm}"` 
+            : 'Nenhum produto encontrado';
+            
+        container.innerHTML = `
+            <div class="empty-state">
+                <ion-icon name="search-outline"></ion-icon>
+                <p>${emptyMessage}</p>
+                <small>Tente ajustar os filtros</small>
+            </div>
+        `;
         return;
     }
     
@@ -7920,7 +7954,6 @@ function displayNewOrderProducts() {
         </div>
     `).join('');
 }
-
 // Adicionar produto ao carrinho
 function addToNewOrderCart(productId) {
     const product = newOrderProducts.find(p => p.id === productId);
