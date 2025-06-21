@@ -1543,6 +1543,387 @@
                 max-height: calc(95vh - 150px);
             }
         }
+/* ================ ESTILOS MELHORADOS PARA MODAL DE NOVO PEDIDO ================ */
+
+/* Modal principal */
+#newOrderModal .modal-content {
+    max-width: 1000px !important;
+    max-height: 95vh !important;
+    height: 90vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+}
+
+/* Header do modal */
+.new-order-header {
+    padding: 20px 30px;
+    border-bottom: 2px solid var(--primary-color);
+    background: linear-gradient(135deg, #FF5722, #FF7043);
+    color: white;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+}
+
+.new-order-header h2 {
+    margin: 0;
+    color: white;
+}
+
+.new-order-header .close {
+    color: white;
+    top: 15px;
+    right: 20px;
+}
+
+.new-order-header .close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Área scrollável do conteúdo */
+.new-order-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 30px;
+}
+
+/* Footer fixo */
+.new-order-footer {
+    padding: 20px 30px;
+    border-top: 1px solid #eee;
+    background: #f8f9fa;
+    border-radius: 0 0 20px 20px;
+}
+
+/* Seção de dados do cliente */
+.customer-section {
+    background: linear-gradient(135deg, #f8f9fa, #e3f2fd);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.customer-section h3 {
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Grid de produtos e carrinho */
+.products-cart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    height: 500px; /* Altura fixa */
+}
+
+/* Seção de produtos */
+.products-section {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.products-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 15px 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.products-filter {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.products-filter select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+}
+
+.products-list {
+    flex: 1;
+    overflow-y: auto;
+    background: white;
+}
+
+/* Seção do carrinho */
+.cart-section {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.cart-header {
+    background: var(--green);
+    color: white;
+    padding: 15px 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cart-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    min-height: 200px;
+}
+
+.cart-summary {
+    background: linear-gradient(135deg, #f8f9fa, #e8f5e8);
+    border-top: 2px solid var(--green);
+    padding: 15px;
+}
+
+/* Itens de produto */
+.order-product-item {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.order-product-item:hover {
+    background: linear-gradient(135deg, #fff3e0, #ffebee);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.order-product-item:last-child {
+    border-bottom: none;
+}
+
+.product-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.product-item-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 1rem;
+}
+
+.product-item-price {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.product-item-description {
+    font-size: 0.9rem;
+    color: var(--black2);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.add-product-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 6px rgba(255, 87, 34, 0.3);
+}
+
+.add-product-btn:hover {
+    background: linear-gradient(135deg, var(--secondary-color), #E64A19);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4);
+}
+
+/* Itens do carrinho */
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--dark-color);
+}
+
+.cart-item-price {
+    font-size: 0.9rem;
+    color: var(--black2);
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quantity-control-simple {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 20px;
+}
+
+.quantity-btn-simple {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn-simple:hover:not(:disabled) {
+    background: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.quantity-btn-simple:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.quantity-btn-simple.remove-all {
+    background: var(--red);
+    margin-left: 8px;
+}
+
+.quantity-btn-simple.remove-all:hover {
+    background: #d32f2f;
+}
+
+.quantity-display-simple {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Estados especiais */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.empty-state ion-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+/* Resumo do carrinho */
+.cart-summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-summary-row.total {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--green);
+    padding-top: 10px;
+    border-top: 2px solid var(--green);
+}
+
+/* Responsivo */
+@media (max-width: 1024px) {
+    #newOrderModal .modal-content {
+        max-width: 95% !important;
+        height: 95vh !important;
+    }
+    
+    .products-cart-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 20px;
+    }
+    
+    .products-section,
+    .cart-section {
+        height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .new-order-content {
+        padding: 15px;
+    }
+    
+    .customer-section {
+        padding: 15px;
+    }
+    
+    .new-order-header,
+    .new-order-footer {
+        padding: 15px 20px;
+    }
+}
     </style>
 </head>
 
@@ -1853,19 +2234,23 @@
             <!-- ======================= Orders Section ================== -->
              <div class="content-section" id="orders">
     <div style="padding: 20px;">
-        <div class="cardHeader" style="margin-bottom: 30px;">
-            <h2>Gestão de Pedidos</h2>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn" onclick="showKitchenView()">
-                    <ion-icon name="restaurant-outline" style="margin-right: 8px;"></ion-icon>
-                    Visão Cozinha
-                </button>
-                <button class="btn-secondary" onclick="refreshOrders()">
-                    <ion-icon name="refresh-outline" style="margin-right: 8px;"></ion-icon>
-                    Atualizar
-                </button>
-            </div>
-        </div>
+       <div class="cardHeader" style="margin-bottom: 30px;">
+    <h2>Gestão de Pedidos</h2>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" onclick="openNewOrderModal()">
+            <ion-icon name="add-outline" style="margin-right: 8px;"></ion-icon>
+            Novo Pedido
+        </button>
+        <button class="btn" onclick="showKitchenView()">
+            <ion-icon name="restaurant-outline" style="margin-right: 8px;"></ion-icon>
+            Visão Cozinha
+        </button>
+        <button class="btn-secondary" onclick="refreshOrders()">
+            <ion-icon name="refresh-outline" style="margin-right: 8px;"></ion-icon>
+            Atualizar
+        </button>
+    </div>
+</div>
 
         <!-- Status Cards -->
         <div class="order-status-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
@@ -2832,6 +3217,133 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal de Novo Pedido -->
+<!-- Modal de Novo Pedido - VERSÃO MELHORADA -->
+<div id="newOrderModal" class="modal">
+    <div class="modal-content">
+        <!-- Header fixo -->
+        <div class="new-order-header">
+            <span class="close" onclick="closeNewOrderModal()">&times;</span>
+            <h2><ion-icon name="receipt-outline"></ion-icon> Novo Pedido</h2>
+        </div>
+        
+        <!-- Conteúdo scrollável -->
+        <div class="new-order-content">
+          
+
+            <!-- Grid de Produtos e Carrinho -->
+            <div class="products-cart-grid">
+                <!-- Seção de Produtos -->
+                <div class="products-section">
+                    <div class="products-header">
+                        <ion-icon name="fast-food-outline"></ion-icon>
+                        Produtos Disponíveis
+                    </div>
+                    <div class="products-filter">
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="flex: 1;">
+                                <input 
+                                    type="text" 
+                                    id="newOrderSearchInput" 
+                                    placeholder="🔍 Buscar produto..." 
+                                    style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;"
+                                    oninput="filterOrderProducts()"
+                                >
+                            </div>
+                            <div style="flex: 1;">
+                                <select id="newOrderCategoryFilter" onchange="filterOrderProducts()" style="width: 100%;">
+                                    <option value="">📋 Todas as categorias</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="products-list" id="newOrderProductsList">
+                        <!-- Produtos serão carregados aqui -->
+                    </div>
+                </div>
+
+                <!-- Seção do Carrinho -->
+                <div class="cart-section">
+                    <div class="cart-header">
+                        <ion-icon name="bag-outline"></ion-icon>
+                        Carrinho de Compras
+                    </div>
+                    <div class="cart-content">
+                        <div class="cart-items" id="newOrderCartItems">
+                            <div class="empty-state">
+                                <ion-icon name="bag-outline"></ion-icon>
+                                <p>Carrinho vazio</p>
+                                <small>Adicione produtos da lista ao lado</small>
+                            </div>
+                        </div>
+                        <div class="cart-summary" id="newOrderCartSummary" style="display: none;">
+                            <div class="cart-summary-content">
+                                <div class="cart-summary-row">
+                                    <span>Total de itens:</span>
+                                    <span id="newOrderTotalItems">0</span>
+                                </div>
+                                <div class="cart-summary-row total">
+                                    <span>💰 Total Geral:</span>
+                                    <span id="newOrderTotalAmount">0,00 MT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+              <!-- Informações do Cliente -->
+            <div class="customer-section">
+                <h3><ion-icon name="person-outline"></ion-icon> Dados do Cliente</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="newOrderCustomerName">Nome Completo *</label>
+                        <input type="text" id="newOrderCustomerName" required placeholder="Nome do cliente">
+                    </div>
+                    <div class="form-group">
+                        <label for="newOrderCustomerPhone">Telefone *</label>
+                        <input type="tel" id="newOrderCustomerPhone" required placeholder="(00) 00000-0000">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="newOrderCustomerEmail">Email (opcional)</label>
+                        <input type="email" id="newOrderCustomerEmail" placeholder="email@exemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="newOrderTable">Mesa (opcional)</label>
+                        <select id="newOrderTable">
+                            <option value="">Selecione uma mesa</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newOrderNotes">Observações</label>
+                    <textarea id="newOrderNotes" placeholder="Observações do pedido..." rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer fixo com botões -->
+        <div class="new-order-footer">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="color: var(--black2); font-size: 0.9rem;">
+                    <ion-icon name="information-circle-outline"></ion-icon>
+                    Preencha os dados e adicione produtos ao carrinho
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <button type="button" class="btn-secondary" onclick="closeNewOrderModal()">
+                        <ion-icon name="close-outline"></ion-icon> Cancelar
+                    </button>
+                    <button type="button" class="btn-primary" onclick="submitNewOrder()" id="submitNewOrderBtn" disabled>
+                        <ion-icon name="checkmark-outline"></ion-icon> Criar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- =========== Scripts =========  -->
     <script>
         // Global variables
@@ -2851,6 +3363,10 @@
         let productPagination = null;
         let allOrdersData = [];
         let orderStats = {};
+        let newOrderCart = {};
+        let newOrderProducts = [];
+        let newOrderCategories = [];
+        let newOrderTables = [];
 
         // Cache simples para evitar requests desnecessários
         const statsCache = {
@@ -4807,6 +5323,7 @@
             const batchTableModal = document.getElementById('batchTableModal');
             const qrManagerModal = document.getElementById('qrManagerModal');
             const tableModal = document.getElementById('tableModal');
+            const newOrderModal = document.getElementById('newOrderModal');
 
             if (event.target === restaurantModal) {
                 closeModal('restaurant');
@@ -4826,6 +5343,8 @@
                 closeQRManagerModal();
             } else if (event.target === tableModal) {
                 closeModal('table');
+            } else if (event.target === newOrderModal) { // ADICIONAR ESTA LINHA
+                closeNewOrderModal(); // ADICIONAR ESTA LINHA
             }
         }
 
@@ -7241,6 +7760,365 @@ function formatDateTime(dateString) {
 
 function refreshOrders() {
     loadOrders();
+}
+
+// ======================= NOVO PEDIDO =======================
+
+// Abrir modal de novo pedido
+async function openNewOrderModal() {
+    // Resetar dados
+    newOrderCart = {};
+    newOrderProducts = [];
+    newOrderCategories = [];
+    newOrderTables = [];
+    
+    try {
+        showLoading(true);
+        
+        // Carregar dados necessários
+        await Promise.all([
+            loadNewOrderCategories(),
+            loadNewOrderProducts(),
+            loadNewOrderTables()
+        ]);
+        
+        // Resetar formulário
+        document.getElementById('newOrderCustomerName').value = '';
+        document.getElementById('newOrderCustomerPhone').value = '';
+        document.getElementById('newOrderCustomerEmail').value = '';
+        document.getElementById('newOrderTable').value = '';
+        document.getElementById('newOrderNotes').value = '';
+        document.getElementById('newOrderSearchInput').value = '';
+        
+        // Mostrar modal
+        document.getElementById('newOrderModal').style.display = 'block';
+        
+        // Renderizar produtos
+        displayNewOrderProducts();
+        updateNewOrderCart();
+        
+    } catch (error) {
+        showError('Erro ao carregar dados: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Fechar modal
+function closeNewOrderModal() {
+    document.getElementById('newOrderModal').style.display = 'none';
+    newOrderCart = {};
+}
+
+// Carregar categorias para o novo pedido
+async function loadNewOrderCategories() {
+    try {
+        let url = `${apiBaseUrl}/categories?limit=100`;
+        
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data?.data) {
+            newOrderCategories = data.data.data.filter(cat => cat.is_active);
+            
+            // Popular select de categorias
+            const categorySelect = document.getElementById('newOrderCategoryFilter');
+            categorySelect.innerHTML = '<option value="">Todas as categorias</option>';
+            
+            newOrderCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+    }
+}
+
+// Carregar produtos para o novo pedido
+async function loadNewOrderProducts() {
+    try {
+        let url = `${apiBaseUrl}/products?limit=100&is_available=true`;
+        
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data?.data) {
+            newOrderProducts = data.data.data;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar produtos:', error);
+    }
+}
+
+// Carregar mesas para o novo pedido
+async function loadNewOrderTables() {
+    try {
+        let url = `${apiBaseUrl}/tables?limit=100&is_active=true`;
+        
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url, {
+            headers: { credentials: 'include' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            newOrderTables = Array.isArray(data.data) ? data.data : data.data.data || [];
+            
+            // Popular select de mesas
+            const tableSelect = document.getElementById('newOrderTable');
+            tableSelect.innerHTML = '<option value="">Selecione uma mesa</option>';
+            
+            newOrderTables.forEach(table => {
+                const option = document.createElement('option');
+                option.value = table.table_number;
+                option.textContent = `Mesa ${table.table_number}${table.name ? ` - ${table.name}` : ''}`;
+                tableSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar mesas:', error);
+    }
+}
+
+// Filtrar produtos por categoria e busca
+function filterOrderProducts() {
+    displayNewOrderProducts();
+}
+
+// Exibir produtos no modal
+function displayNewOrderProducts() {
+    const container = document.getElementById('newOrderProductsList');
+    const categoryFilter = document.getElementById('newOrderCategoryFilter').value;
+    const searchTerm = document.getElementById('newOrderSearchInput')?.value.toLowerCase() || '';
+    
+    let filteredProducts = newOrderProducts;
+    
+    // Filtro por categoria
+    if (categoryFilter) {
+        filteredProducts = filteredProducts.filter(product => 
+            product.category_id.toString() === categoryFilter
+        );
+    }
+    
+    // Filtro por busca de texto
+    if (searchTerm) {
+        filteredProducts = filteredProducts.filter(product => 
+            product.name.toLowerCase().includes(searchTerm) ||
+            (product.description && product.description.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    if (filteredProducts.length === 0) {
+        const emptyMessage = searchTerm 
+            ? `Nenhum produto encontrado para "${searchTerm}"` 
+            : 'Nenhum produto encontrado';
+            
+        container.innerHTML = `
+            <div class="empty-state">
+                <ion-icon name="search-outline"></ion-icon>
+                <p>${emptyMessage}</p>
+                <small>Tente ajustar os filtros</small>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filteredProducts.map(product => `
+        <div class="order-product-item" onclick="addToNewOrderCart(${product.id})">
+            <div class="product-item-header">
+                <span class="product-item-name">${product.name}</span>
+                <span class="product-item-price">${formatPrice(product.current_price)} MT</span>
+            </div>
+            ${product.description ? `<div class="product-item-description">${product.description}</div>` : ''}
+            <button class="add-product-btn" onclick="event.stopPropagation(); addToNewOrderCart(${product.id})">
+                <ion-icon name="add-outline"></ion-icon> Adicionar
+            </button>
+        </div>
+    `).join('');
+}
+// Adicionar produto ao carrinho
+function addToNewOrderCart(productId) {
+    const product = newOrderProducts.find(p => p.id === productId);
+    if (!product) return;
+    
+    if (!newOrderCart[productId]) {
+        newOrderCart[productId] = {
+            id: productId,
+            name: product.name,
+            price: parseFloat(product.current_price),
+            quantity: 0
+        };
+    }
+    
+    newOrderCart[productId].quantity++;
+    updateNewOrderCart();
+}
+
+// Remover produto do carrinho
+function removeFromNewOrderCart(productId) {
+    if (newOrderCart[productId]) {
+        newOrderCart[productId].quantity--;
+        
+        if (newOrderCart[productId].quantity <= 0) {
+            delete newOrderCart[productId];
+        }
+    }
+    
+    updateNewOrderCart();
+}
+
+// Atualizar exibição do carrinho
+function updateNewOrderCart() {
+    const cartItemsContainer = document.getElementById('newOrderCartItems');
+    const cartSummary = document.getElementById('newOrderCartSummary');
+    const submitBtn = document.getElementById('submitNewOrderBtn');
+    
+    const cartItems = Object.values(newOrderCart);
+    
+    if (cartItems.length === 0) {
+        cartItemsContainer.innerHTML = '<p style="text-align: center; color: #666; margin-top: 50px;">Carrinho vazio</p>';
+        cartSummary.style.display = 'none';
+        submitBtn.disabled = true;
+        return;
+    }
+    
+    // Exibir itens do carrinho
+    cartItemsContainer.innerHTML = cartItems.map(item => `
+        <div class="cart-item">
+            <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">${formatPrice(item.price)} MT cada</div>
+            </div>
+            <div class="cart-item-controls">
+                <div class="quantity-control-simple">
+                    <button class="quantity-btn-simple" onclick="removeFromNewOrderCart(${item.id})" ${item.quantity <= 1 ? '' : ''}>
+                        −
+                    </button>
+                    <span class="quantity-display-simple">${item.quantity}</span>
+                    <button class="quantity-btn-simple" onclick="addToNewOrderCart(${item.id})">
+                        +
+                    </button>
+                </div>
+                <button class="quantity-btn-simple" onclick="removeAllFromNewOrderCart(${item.id})" title="Remover item" style="background: var(--red);">
+                    <ion-icon name="trash-outline"></ion-icon>
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Calcular totais
+    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const totalAmount = cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+    
+    // Exibir resumo
+    document.getElementById('newOrderTotalItems').textContent = totalItems;
+    document.getElementById('newOrderTotalAmount').textContent = formatPrice(totalAmount) + ' MT';
+    
+    cartSummary.style.display = 'block';
+    submitBtn.disabled = false;
+}
+
+// Remover todos os itens de um produto
+function removeAllFromNewOrderCart(productId) {
+    delete newOrderCart[productId];
+    updateNewOrderCart();
+}
+
+// Submeter novo pedido
+async function submitNewOrder() {
+    try {
+        // Validar dados do cliente
+        const customerName = document.getElementById('newOrderCustomerName').value.trim();
+        const customerPhone = document.getElementById('newOrderCustomerPhone').value.trim();
+        const customerEmail = document.getElementById('newOrderCustomerEmail').value.trim();
+        const tableNumber = document.getElementById('newOrderTable').value;
+        const notes = document.getElementById('newOrderNotes').value.trim();
+        
+        if (!customerName || !customerPhone) {
+            showError('Nome e telefone do cliente são obrigatórios');
+            return;
+        }
+        
+        if (Object.keys(newOrderCart).length === 0) {
+            showError('Adicione pelo menos um produto ao pedido');
+            return;
+        }
+        
+        showLoading(true);
+        
+        // Preparar dados do pedido
+        const cartItems = Object.values(newOrderCart);
+        const totalAmount = cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+        
+        const orderData = {
+            restaurant_id: currentUser.restaurant_id,
+            customer_name: customerName,
+            customer_phone: customerPhone,
+            customer_email: customerEmail || null,
+            notes: notes || null,
+            total_amount: totalAmount,
+            items: cartItems.map(item => ({
+                product_id: item.id,
+                quantity: item.quantity,
+                unit_price: item.price
+            }))
+        };
+        
+        // Adicionar mesa se selecionada
+        if (tableNumber) {
+            orderData.table_number = parseInt(tableNumber);
+        }
+        
+        // Enviar pedido
+        const response = await fetch(`${apiBaseUrl}/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                credentials: 'include'
+            },
+            body: JSON.stringify(orderData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`Pedido #${data.data.order_number} criado com sucesso!`);
+            closeNewOrderModal();
+            
+            // Recarregar lista de pedidos
+            if (document.getElementById('orders').classList.contains('active')) {
+                await loadOrders();
+            }
+            
+            // Atualizar estatísticas
+            await loadOrderStats();
+        } else {
+            throw new Error(data.message || 'Erro ao criar pedido');
+        }
+        
+    } catch (error) {
+        showError('Erro ao criar pedido: ' + error.message);
+    } finally {
+        showLoading(false);
+    }
 }
 
     </script>
