@@ -2877,8 +2877,11 @@ async function loadTables() {
         let url = `${apiBaseUrl}/tables?limit=100`;
         
         // Filtrar por restaurante se for restaurant_user
+        // if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+        //     url = `${apiBaseUrl}/restaurants/${currentUser.restaurant_id}/tables`;
+        // }
         if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
-            url = `${apiBaseUrl}/restaurants/${currentUser.restaurant_id}/tables`;
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
         }
         
         const response = await fetch(url, {
@@ -4671,28 +4674,37 @@ function showRestaurantQRInfo(restaurantId) {
 //Categorias
 
         // Categories functions
-        async function loadCategories() {
-            try {
-                showLoading(true);
-                let url = `${apiBaseUrl}/categories`;
-                if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
-                    url += `?restaurant_id=${currentUser.restaurant_id}`;
-                }
-                const response = await fetch(url);
-                const data = await response.json();
-
-
-                console.log("Dados de Categorias:", data);
-                
-                if (data.success && data.data && data.data.data) {
-                    displayCategories(data.data.data);
-                }
-            } catch (error) {
-                showError('Erro ao carregar categorias');
-            } finally {
-                showLoading(false);
-            }
+  async function loadCategories() {
+    try {
+        showLoading(true);
+        let url = `${apiBaseUrl}/categories?limit=100`;
+        
+        // Filtrar por restaurante se for restaurant_user
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
         }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        console.log("Dados de Categorias:", data);
+        
+        if (data.success && data.data && data.data.data) {
+            allCategoriesData = data.data.data;
+            populateCategoryFilters();
+            applyCategoryFilters();
+        } else {
+            allCategoriesData = [];
+            displayCategories([]);
+        }
+    } catch (error) {
+        showError('Erro ao carregar categorias');
+        allCategoriesData = [];
+        displayCategories([]);
+    } finally {
+        showLoading(false);
+    }
+}
 
        function displayCategories(categories) {
     const grid = document.getElementById('categoryGrid');
