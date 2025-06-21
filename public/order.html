@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazer Pedido - Menu Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF5722, #FF7043);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(255, 87, 34, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .restaurant-info {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FF5722;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .menu-container {
+            padding: 0 20px 120px;
+        }
+
+        .category {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .category-header {
+            background: #FF5722;
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .product {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 20px;
+            transition: background 0.3s;
+        }
+
+        .product:last-child {
+            border-bottom: none;
+        }
+
+        .product:hover {
+            background: #fafafa;
+        }
+
+        .product-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .product-price {
+            color: #FF5722;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .product-price.promotion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .product-price .old-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 8px;
+            min-width: 120px;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #FF5722;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover:not(:disabled) {
+            background: #E64A19;
+            transform: scale(1.05);
+        }
+
+        .quantity-btn:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quantity-display {
+            font-weight: 600;
+            min-width: 24px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .cart-summary {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.15);
+            z-index: 100;
+            border-top: 1px solid #eee;
+        }
+
+        .cart-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cart-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .cart-total {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #FF5722;
+        }
+
+        .cart-items {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .order-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #FF5722, #FF7043);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        .order-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #E64A19, #FF5722);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
+        }
+
+        .order-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FF5722;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .product-content {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .quantity-control {
+                align-self: flex-end;
+            }
+
+            .modal-content {
+                margin: 20px auto;
+                width: 95%;
+            }
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .badge {
+            background: #FF5722;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 id="restaurantName">Menu Digital</h1>
+        <p id="tableInfo" style="font-size: 0.9rem; opacity: 0.9;"></p>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Carregando menu...</p>
+    </div>
+
+    <div class="restaurant-info" id="restaurantInfo" style="display: none;">
+        <h2 id="restaurantTitle"></h2>
+        <p id="restaurantDetails"></p>
+    </div>
+
+    <div class="menu-container" id="menuContainer" style="display: none;">
+        <!-- Menu será carregado aqui -->
+    </div>
+
+    <div class="cart-summary" id="cartSummary" style="display: none;">
+        <div class="cart-content">
+            <div class="cart-info">
+                <div>
+                    <div class="cart-total">Total: <span id="cartTotal">0,00 MT</span></div>
+                    <div class="cart-items" id="cartItems">0 itens</div>
+                </div>
+                <button class="quantity-btn" onclick="showCart()" title="Ver carrinho">
+                    🛒
+                </button>
+            </div>
+            <button class="order-btn" onclick="showCustomerForm()">
+                Fazer Pedido
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal do carrinho -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>Seu Carrinho</h2>
+            <div id="cartDetails"></div>
+        </div>
+    </div>
+
+    <!-- Modal do formulário do cliente -->
+    <div class="modal" id="customerModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCustomerForm()">&times;</span>
+            <h2>Finalizar Pedido</h2>
+            <form id="customerForm">
+                <div class="form-group">
+                    <label for="customerName">Nome Completo *</label>
+                    <input type="text" id="customerName" required placeholder="Seu nome">
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">Telefone *</label>
+                    <input type="tel" id="customerPhone" required placeholder="(00) 00000-0000">
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Email (opcional)</label>
+                    <input type="email" id="customerEmail" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="orderNotes">Observações</label>
+                    <textarea id="orderNotes" rows="3" placeholder="Ex: Sem cebola, bem passado..."></textarea>
+                </div>
+                <button type="submit" class="order-btn">
+                    Confirmar Pedido
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de sucesso -->
+    <div class="modal" id="successModal">
+        <div class="modal-content success-message">
+            <div class="success-icon">✅</div>
+            <h2>Pedido Enviado!</h2>
+            <p>Seu pedido foi recebido e será processado em breve.</p>
+            <p style="margin: 20px 0;"><strong>Número:</strong> <span id="orderNumber" class="badge"></span></p>
+            <button class="order-btn" onclick="location.reload()">
+                Fazer Novo Pedido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Configuração
+        const apiBaseUrl = window.location.origin + '/api/v1';
+        let restaurantData = null;
+        let menuData = [];
+        let cart = {};
+
+        // Utilitários
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function formatPrice(price) {
+            return parseFloat(price).toFixed(2).replace('.', ',');
+        }
+
+        function showError(message) {
+            document.getElementById('loading').innerHTML = `
+                <div class="error-message">
+                    <p>${message}</p>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: #FF5722; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Tentar Novamente
+                    </button>
+                </div>
+            `;
+        }
+
+        // Carregar menu
+        async function loadMenu() {
+            try {
+                const restaurantUuid = getUrlParameter('restaurant');
+                const tableNumber = getUrlParameter('table');
+
+                if (!restaurantUuid) {
+                    throw new Error('Link inválido. Escaneie o QR code novamente.');
+                }
+
+                let menuUrl = `${apiBaseUrl}/menu/restaurant/${restaurantUuid}`;
+                
+                const response = await fetch(menuUrl);
+                const data = await response.json();
+
+                if (data.success || data.restaurant) {
+                    restaurantData = data.restaurant;
+                    menuData = data.menu || [];
+                    
+                    updateRestaurantInfo(tableNumber);
+                    displayMenu();
+                    
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('restaurantInfo').style.display = 'block';
+                    document.getElementById('menuContainer').style.display = 'block';
+                } else {
+                    throw new Error('Menu não encontrado');
+                }
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Atualizar informações do restaurante
+        function updateRestaurantInfo(tableNumber) {
+            document.getElementById('restaurantName').textContent = restaurantData.name;
+            document.getElementById('restaurantTitle').textContent = restaurantData.name;
+            
+            let details = [];
+            if (restaurantData.address) details.push(restaurantData.address);
+            if (restaurantData.phone) details.push(restaurantData.phone);
+            
+            document.getElementById('restaurantDetails').textContent = details.join(' • ');
+
+            if (tableNumber) {
+                document.getElementById('tableInfo').textContent = `Mesa ${tableNumber}`;
+            }
+        }
+
+        // Exibir menu
+        function displayMenu() {
+            const container = document.getElementById('menuContainer');
+            
+            if (!menuData || menuData.length === 0) {
+                container.innerHTML = '<div class="empty-cart"><p>Nenhum produto disponível no momento.</p></div>';
+                return;
+            }
+
+            container.innerHTML = menuData.map(category => `
+                <div class="category">
+                    <div class="category-header">
+                        ${category.category_name}
+                    </div>
+                    ${category.products.map(product => `
+                        <div class="product">
+                            <div class="product-content">
+                                <div class="product-info">
+                                    <div class="product-name">${product.name}</div>
+                                    ${product.description ? `<div class="product-description">${product.description}</div>` : ''}
+                                    <div class="product-price ${product.is_on_promotion ? 'promotion' : ''}">
+                                        ${product.is_on_promotion && product.current_price < product.regular_price ? 
+                                            `<span>${formatPrice(product.current_price)} MT</span>
+                                             <span class="old-price">${formatPrice(product.regular_price)} MT</span>` :
+                                            `${formatPrice(product.current_price)} MT`
+                                        }
+                                    </div>
+                                </div>
+                                <div class="quantity-control">
+                                    <button class="quantity-btn" onclick="removeFromCart(${product.id})" 
+                                            id="remove-${product.id}" disabled>
+                                        −
+                                    </button>
+                                    <span class="quantity-display" id="qty-${product.id}">0</span>
+                                    <button class="quantity-btn" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.current_price})">
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        // Funções do carrinho
+        function addToCart(productId, productName, price) {
+            if (!cart[productId]) {
+                cart[productId] = {
+                    id: productId,
+                    name: productName,
+                    price: parseFloat(price),
+                    quantity: 0
+                };
+            }
+            
+            cart[productId].quantity++;
+            updateProductDisplay(productId);
+            updateCartSummary();
+        }
+
+        function removeFromCart(productId) {
+            if (cart[productId] && cart[productId].quantity > 0) {
+                cart[productId].quantity--;
+                
+                if (cart[productId].quantity === 0) {
+                    delete cart[productId];
+                }
+                
+                updateProductDisplay(productId);
+                updateCartSummary();
+            }
+        }
+
+        function updateProductDisplay(productId) {
+            const qtyElement = document.getElementById(`qty-${productId}`);
+            const removeBtn = document.getElementById(`remove-${productId}`);
+            
+            const quantity = cart[productId]?.quantity || 0;
+            
+            if (qtyElement) qtyElement.textContent = quantity;
+            if (removeBtn) removeBtn.disabled = quantity === 0;
+        }
+
+        function updateCartSummary() {
+            const cartItems = Object.values(cart);
+            const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+
+            document.getElementById('cartItems').textContent = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
+            document.getElementById('cartTotal').textContent = `${formatPrice(totalPrice)} MT`;
+
+            const cartSummary = document.getElementById('cartSummary');
+            cartSummary.style.display = totalItems > 0 ? 'block' : 'none';
+        }
+
+        // Modais
+        function showCart() {
+            const cartItems = Object.values(cart);
+            const modal = document.getElementById('cartModal');
+            const details = document.getElementById('cartDetails');
+            
+            if (cartItems.length === 0) {
+                details.innerHTML = '<div class="empty-cart"><p>Carrinho vazio</p></div>';
+            } else {
+                details.innerHTML = `
+                    ${cartItems.map(item => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                            <div>
+                                <strong>${item.name}</strong><br>
+                                <span style="color: #666;">${formatPrice(item.price)} MT cada</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <span>${item.quantity}x</span><br>
+                                <strong style="color: #FF5722;">${formatPrice(item.quantity * item.price)} MT</strong>
+                            </div>
+                        </div>
+                    `).join('')}
+                    <div style="margin-top: 20px; text-align: right; font-size: 1.2rem; font-weight: 700; color: #FF5722;">
+                        Total: ${formatPrice(cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0))} MT
+                    </div>
+                `;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function showCustomerForm() {
+            if (Object.keys(cart).length === 0) {
+                alert('Adicione itens ao carrinho primeiro');
+                return;
+            }
+            
+            document.getElementById('customerModal').style.display = 'block';
+        }
+
+        function closeCustomerForm() {
+            document.getElementById('customerModal').style.display = 'none';
+        }
+
+        // Enviar pedido
+        async function submitOrder(customerData) {
+            try {
+                const cartItems = Object.values(cart);
+                const total = cartItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                const tableNumber = getUrlParameter('table');
+
+                const orderData = {
+                    restaurant_id: restaurantData.id,
+                    table_number: tableNumber ? parseInt(tableNumber) : null,
+                    customer_name: customerData.name,
+                    customer_phone: customerData.phone,
+                    customer_email: customerData.email || null,
+                    notes: customerData.notes || null,
+                    subtotal: total,
+                    total_amount: total,
+                    items: cartItems.map(item => ({
+                        product_id: item.id,
+                        quantity: item.quantity,
+                        unit_price: item.price
+                    }))
+                };
+
+                const response = await fetch(`${apiBaseUrl}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('orderNumber').textContent = data.data.order_number;
+                    document.getElementById('customerModal').style.display = 'none';
+                    document.getElementById('successModal').style.display = 'block';
+                    
+                    // Limpar carrinho
+                    cart = {};
+                    updateCartSummary();
+                } else {
+                    throw new Error(data.message || 'Erro ao enviar pedido');
+                }
+            } catch (error) {
+                alert('Erro ao enviar pedido: ' + error.message);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('customerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const customerData = {
+                name: document.getElementById('customerName').value.trim(),
+                phone: document.getElementById('customerPhone').value.trim(),
+                email: document.getElementById('customerEmail').value.trim(),
+                notes: document.getElementById('orderNotes').value.trim()
+            };
+
+            if (!customerData.name || !customerData.phone) {
+                alert('Nome e telefone são obrigatórios');
+                return;
+            }
+
+            submitOrder(customerData);
+        });
+
+        // Fechar modais clicando fora
+        window.onclick = function(event) {
+            const modals = ['cartModal', 'customerModal', 'successModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', loadMenu);
+    </script>
+</body>
+</html>
