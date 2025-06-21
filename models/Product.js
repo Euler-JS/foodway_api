@@ -59,9 +59,10 @@ async findAll(options = {}) {
       `;
     }
 
+    // CORREÇÃO PRINCIPAL: Adicionar count: 'exact' para obter total
     let query = supabase
       .from(this.table)
-      .select(selectClause)
+      .select(selectClause, { count: 'exact' })  // ← ESTA É A CORREÇÃO PRINCIPAL
       .order(sortBy, { ascending: sortOrder === 'asc' });
 
     // Filtros opcionais
@@ -104,13 +105,18 @@ async findAll(options = {}) {
       throw handleSupabaseError(error);
     }
 
+    // CORREÇÃO: Garantir que count seja retornado
+    const totalCount = count !== null ? count : (data?.length || 0);
+
     return {
       data: data || [],
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: count || data?.length || 0,
-        totalPages: Math.ceil((count || data?.length || 0) / limit)
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasNextPage: parseInt(page) < Math.ceil(totalCount / limit),
+        hasPrevPage: parseInt(page) > 1
       }
     };
   } catch (error) {
@@ -575,62 +581,64 @@ async findAll(options = {}) {
    * @param {Object} options - Opções adicionais
    * @returns {Promise<Array>} - Lista de produtos em promoção
    */
-  async findPromotions(restaurantId = null, options = {}) {
-    try {
-      const {
-        page = 1,
-        limit = 10,
-        sortBy = 'created_at',
-        sortOrder = 'desc'
-      } = options;
+ async findPromotions(restaurantId = null, options = {}) {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'created_at',
+      sortOrder = 'desc'
+    } = options;
 
-      let query = supabase
-        .from(this.table)
-        .select(`
-          *,
-          category:categories(
+    let query = supabase
+      .from(this.table)
+      .select(`
+        *,
+        category:categories(
+          id,
+          name,
+          restaurant_id,
+          restaurant:restaurants(
             id,
             name,
-            restaurant_id,
-            restaurant:restaurants(
-              id,
-              name,
-              city
-            )
+            city
           )
-        `)
-        .eq('is_on_promotion', true)
-        .eq('is_available', true)
-        .order(sortBy, { ascending: sortOrder === 'asc' });
+        )
+      `, { count: 'exact' })  // ← ADICIONAR count: 'exact'
+      .eq('is_on_promotion', true)
+      .eq('is_available', true)
+      .order(sortBy, { ascending: sortOrder === 'asc' });
 
-      if (restaurantId) {
-        query = query.eq('categories.restaurant_id', restaurantId);
-      }
-
-      // Paginação
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        throw handleSupabaseError(error);
-      }
-
-      return {
-        data: data || [],
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total: count || data?.length || 0,
-          totalPages: Math.ceil((count || data?.length || 0) / limit)
-        }
-      };
-    } catch (error) {
-      throw error;
+    if (restaurantId) {
+      query = query.eq('categories.restaurant_id', restaurantId);
     }
+
+    // Paginação
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw handleSupabaseError(error);
+    }
+
+    const totalCount = count !== null ? count : (data?.length || 0);
+
+    return {
+      data: data || [],
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    };
+  } catch (error) {
+    throw error;
   }
+}
 
   /**
    * Buscar estatísticas dos produtos
