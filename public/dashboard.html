@@ -5356,6 +5356,10 @@
 
         // Aplicar filtros ativos
         const filters = getCurrentProductFilters();
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            delete filters.restaurant_id;
+        }
+        
         Object.keys(filters).forEach(key => {
             if (filters[key] !== null && filters[key] !== '') {
                 url += `&${key}=${encodeURIComponent(filters[key])}`;
@@ -5420,15 +5424,20 @@
     }
 }
         // Função para capturar filtros atuais
-        function getCurrentProductFilters() {
-            return {
-                search: document.getElementById('productSearch')?.value.trim() || null,
-                category_id: document.getElementById('productCategoryFilter')?.value || null,
-                restaurant_id: document.getElementById('productRestaurantFilter')?.value || null,
-                is_available: document.getElementById('productStatusFilter')?.value || null,
-                is_on_promotion: document.getElementById('productPromotionFilter')?.value || null
-            };
-        }
+      function getCurrentProductFilters() {
+    const restaurantId = document.getElementById('productRestaurantFilter')?.value;
+    const categoryId = document.getElementById('productCategoryFilter')?.value;
+
+    console.log('🔍 Capturando filtros de produtos:', restaurantId, categoryId);
+    
+    return {
+        search: document.getElementById('productSearch')?.value.trim() || null,
+        category_id: categoryId && categoryId !== '' ? parseInt(categoryId) : null,
+        restaurant_id: restaurantId && restaurantId !== '' ? parseInt(restaurantId) : null,
+        is_available: document.getElementById('productStatusFilter')?.value || null,
+        is_on_promotion: document.getElementById('productPromotionFilter')?.value || null
+    };
+}
 
 
 
