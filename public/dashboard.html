@@ -4983,29 +4983,6 @@ function viewCategoryProducts(categoryId) {
 // Category filtering system
 let allCategoriesData = []; // Store all categories for filtering
 
-async function loadCategories() {
-    try {
-        showLoading(true);
-        const response = await fetch(`${apiBaseUrl}/categories?limit=100`);
-        const data = await response.json();
-        
-        if (data.success && data.data && data.data.data) {
-            allCategoriesData = data.data.data;
-            populateCategoryFilters();
-            applyCategoryFilters();
-        } else {
-            allCategoriesData = [];
-            displayCategories([]);
-        }
-    } catch (error) {
-        showError('Erro ao carregar categorias');
-        allCategoriesData = [];
-        displayCategories([]);
-    } finally {
-        showLoading(false);
-    }
-}
-
 function populateCategoryFilters() {
     const restaurantFilter = document.getElementById('categoryRestaurantFilter');
     restaurantFilter.innerHTML = '<option value="">Todos</option>';
@@ -5164,7 +5141,14 @@ async function loadProducts() {
  */
 async function loadCategoriesForProducts() {
     try {
-        const response = await fetch(`${apiBaseUrl}/categories?limit=100`);
+        let url = `${apiBaseUrl}/categories?limit=100`;
+        
+        // Filtrar por restaurante se for restaurant_user
+        if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+            url += `&restaurant_id=${currentUser.restaurant_id}`;
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         if (data.success && data.data && data.data.data) {
