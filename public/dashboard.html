@@ -5110,9 +5110,12 @@ async function loadProducts() {
     try {
         showLoading(true);
         let url = `${apiBaseUrl}/products?limit=100`;
+        
+        // Filtrar por restaurante se for restaurant_user
         if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
             url += `&restaurant_id=${currentUser.restaurant_id}`;
         }
+        
         const response = await fetch(url);
         const data = await response.json();
         
@@ -5135,7 +5138,6 @@ async function loadProducts() {
         showLoading(false);
     }
 }
-
 /**
  * Carregar categorias para os filtros e formulários
  */
@@ -5299,11 +5301,11 @@ function openProductModal(data = null) {
         form.reset();
         document.getElementById('productAvailable').checked = true;
     }
-    if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
-        allCategoriesForProducts = allCategoriesForProducts.filter(cat => 
-            cat.restaurant_id === currentUser.restaurant_id
-        );
-    }
+    // if (currentUser?.role === 'restaurant_user' && currentUser.restaurant_id) {
+    //     allCategoriesForProducts = allCategoriesForProducts.filter(cat => 
+    //         cat.restaurant_id === currentUser.restaurant_id
+    //     );
+    // }
     modal.style.display = 'block';
 }
 

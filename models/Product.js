@@ -11,92 +11,112 @@ class Product {
    * @param {Object} options - Opções de filtro e paginação
    * @returns {Promise<Array>} - Lista de produtos
    */
-  async findAll(options = {}) {
-    try {
-      const {
-        page = 1,
-        limit = 10,
-        categoryId = null,
-        restaurantId = null,
-        isAvailable = null,
-        isOnPromotion = null,
-        minPrice = null,
-        maxPrice = null,
-        search = null,
-        sortBy = 'sort_order',
-        sortOrder = 'asc'
-      } = options;
+async findAll(options = {}) {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      categoryId = null,
+      restaurantId = null,
+      isAvailable = null,
+      isOnPromotion = null,
+      minPrice = null,
+      maxPrice = null,
+      search = null,
+      sortBy = 'sort_order',
+      sortOrder = 'asc'
+    } = options;
 
-      let query = supabase
-        .from(this.table)
-        .select(`
-          *,
-          category:categories(
+    // Se há filtro por restaurante, usar INNER JOIN
+    let selectClause;
+    if (restaurantId) {
+      selectClause = `
+        *,
+        category:categories!inner(
+          id,
+          name,
+          restaurant_id,
+          restaurant:restaurants(
             id,
             name,
-            restaurant_id,
-            restaurant:restaurants(
-              id,
-              name,
-              city
-            )
+            city
           )
-        `)
-        .order(sortBy, { ascending: sortOrder === 'asc' });
-
-      // Filtros opcionais
-      if (categoryId) {
-        query = query.eq('category_id', categoryId);
-      }
-
-      if (restaurantId) {
-        query = query.eq('categories.restaurant_id', restaurantId);
-      }
-
-      if (isAvailable !== null) {
-        query = query.eq('is_available', isAvailable);
-      }
-
-      if (isOnPromotion !== null) {
-        query = query.eq('is_on_promotion', isOnPromotion);
-      }
-
-      if (minPrice !== null) {
-        query = query.gte('current_price', minPrice);
-      }
-
-      if (maxPrice !== null) {
-        query = query.lte('current_price', maxPrice);
-      }
-
-      if (search) {
-        query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
-      }
-
-      // Paginação
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        throw handleSupabaseError(error);
-      }
-
-      return {
-        data: data || [],
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total: count || data?.length || 0,
-          totalPages: Math.ceil((count || data?.length || 0) / limit)
-        }
-      };
-    } catch (error) {
-      throw error;
+        )
+      `;
+    } else {
+      selectClause = `
+        *,
+        category:categories(
+          id,
+          name,
+          restaurant_id,
+          restaurant:restaurants(
+            id,
+            name,
+            city
+          )
+        )
+      `;
     }
+
+    let query = supabase
+      .from(this.table)
+      .select(selectClause)
+      .order(sortBy, { ascending: sortOrder === 'asc' });
+
+    // Filtros opcionais
+    if (categoryId) {
+      query = query.eq('category_id', categoryId);
+    }
+
+    if (restaurantId) {
+      query = query.eq('categories.restaurant_id', restaurantId);
+    }
+
+    if (isAvailable !== null) {
+      query = query.eq('is_available', isAvailable);
+    }
+
+    if (isOnPromotion !== null) {
+      query = query.eq('is_on_promotion', isOnPromotion);
+    }
+
+    if (minPrice !== null) {
+      query = query.gte('current_price', minPrice);
+    }
+
+    if (maxPrice !== null) {
+      query = query.lte('current_price', maxPrice);
+    }
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    // Paginação
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw handleSupabaseError(error);
+    }
+
+    return {
+      data: data || [],
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: count || data?.length || 0,
+        totalPages: Math.ceil((count || data?.length || 0) / limit)
+      }
+    };
+  } catch (error) {
+    throw error;
   }
+}
 
   /**
    * Buscar produto por ID
