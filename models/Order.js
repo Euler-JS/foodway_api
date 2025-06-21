@@ -118,7 +118,13 @@ class Order {
       // Filtros
       if (restaurantId) query = query.eq('restaurant_id', restaurantId);
       if (tableId) query = query.eq('table_id', tableId);
-      if (status) query = query.eq('status', status);
+      if (status) {
+        if (Array.isArray(status)) {
+          query = query.in('status', status);  // Para arrays: ['confirmed', 'preparing']
+        } else {
+          query = query.eq('status', status);  // Para strings: 'pending'
+        }
+      }
       if (startDate) query = query.gte('created_at', startDate);
       if (endDate) query = query.lte('created_at', endDate);
 
